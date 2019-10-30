@@ -1,14 +1,14 @@
 # Be sure to
 
-1. for `minimial_widget.html`:
-  * replace `<<smooch appId Here>>` with your smooch appId (it should still be within single-`'` or double-quotes`"`
-  * for best results, serve the `minimal_widget.html` page via a server (e.g.: `python -m SimpleHTTPServer 80`)
 1. deploy to aws and note your service's POST endpoint
 1. setup your Smooch app: (most steps are commented out as part of `linkBot2App()`)
-  1. create your pipeline processor object (webhook)
-  1. add your processor to the `appuser` pipeline
+    1. create your pipeline processor object (webhook)
+    1. add your processor to the `appuser` pipeline
 1. create an entry in your DynamoDb table for your [configured] app, as in the example below
-
+1. for `minimial_widget.html`:
+    * replace `<<smooch appId Here>>` with your smooch appId (it should still be within single-`'` or double-quotes`"`
+    * for best results, serve the `minimal_widget.html` page via a server (e.g.: `python -m SimpleHTTPServer 80`)
+  
 # Examples
 ## DynamoDB 'approved Apps' table entry
     {
@@ -19,4 +19,4 @@
     "processorSecret": "gUECxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxKyzw"
     }
 
-You can customize your responses 
+You can customize your responses in responses.json file and then `sls deploy`
