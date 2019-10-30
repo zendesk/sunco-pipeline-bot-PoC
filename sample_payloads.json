@@ -1,0 +1,208 @@
+[
+    {
+        "trigger": "message:appUser",
+        "nonce": "mw_9NWvc_xpYyon63VlijVCAPjN",
+        "app": {
+            "_id": "5da8xxxxxxxxxxxxxxxx2852"
+        },
+        "appUser": {
+            "_id": "0c3cxxxxxxxxxxxxxxxx9a02",
+            "conversationStarted": true
+        },
+        "message": {
+            "role": "appUser",
+            "authorId": "0c3cxxxxxxxxxxxxxxxx9a02",
+            "name": "Web User 0c3cxxxxxxxxxxxxxxxx9a02",
+            "_id": "5dafxxxxxxxxxxxxxxxx24a0",
+            "type": "text",
+            "received": 1571777808.289,
+            "text": "asdfas",
+            "source": {
+                "type": "web",
+                "id": "add3xxxxxxxxxxxxxxxx49d9",
+                "integrationId": "5dafxxxxxxxxxxxxxxxx81e8"
+            }
+        }
+    },
+    {
+        "trigger": "message:appUser",
+        "nonce": "mw_iMEvBRabj3YK1cuE1Mh0RQKz",
+        "app": {
+            "_id": "5dafxxxxxxxxxxxxxxxx1c37"
+        },
+        "appUser": {
+            "_id": "b484xxxxxxxxxxxxxxxx5b61",
+            "conversationStarted": true
+        },
+        "message": {
+            "role": "appUser",
+            "authorId": "b484xxxxxxxxxxxxxxxx5b61",
+            "name": "Web User b484xxxxxxxxxxxxxxxx5b61",
+            "_id": "5db1xxxxxxxxxxxxxxxxefc1",
+            "type": "formResponse",
+            "received": 1571944440.907,
+            "textFallback": "Delivery address: 123 Street\nDelivery date: Monday",
+            "fields": [
+                {
+                    "_id": "5db1xxxxxxxxxxxxxxxxefbe",
+                    "name": "Delivery address",
+                    "label": "Delivery address",
+                    "type": "text",
+                    "text": "123 Street"
+                },
+                {
+                    "_id": "5db1xxxxxxxxxxxxxxxxefc0",
+                    "name": "Delivery date",
+                    "label": "Delivery date",
+                    "type": "select",
+                    "selectSize": 0,
+                    "select": [
+                        {
+                            "name": "Monday",
+                            "label": "Monday",
+                            "_id": "5db1xxxxxxxxxxxxxxxxefc3"
+                        }
+                    ],
+                    "options": []
+                }
+            ],
+            "quotedMessageId": "5db1xxxxxxxxxxxxxxxxcfce",
+            "source": {
+                "type": "web",
+                "id": "0457xxxxxxxxxxxxxxxxxxxxxxxxf597",
+                "integrationId": "5dafxxxxxxxxxxxxxxxx81e8"
+            }
+        }
+    },
+    {
+        "resource": "/integrate",
+        "path": "/integrate",
+        "httpMethod": "GET",
+        "headers": {
+            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,* /*;q=0.8,application/signed-exchange;v=b3",
+            "Accept-Encoding": "gzip, deflate, br",
+            "Accept-Language": "en-US,en;q=0.9,fr;q=0.8",
+            "cache-control": "max-age=0",
+            "CloudFront-Forwarded-Proto": "https",
+            "CloudFront-Is-Desktop-Viewer": "true",
+            "CloudFront-Is-Mobile-Viewer": "false",
+            "CloudFront-Is-SmartTV-Viewer": "false",
+            "CloudFront-Is-Tablet-Viewer": "false",
+            "CloudFront-Viewer-Country": "CA",
+            "Host": "qf0xxxx7d0.execute-api.us-east-1.amazonaws.com",
+            "sec-fetch-mode": "navigate",
+            "sec-fetch-site": "null",
+            "sec-fetch-user": "?1",
+            "upgrade-insecure-requests": "1",
+            "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.90 Safari/537.36",
+            "Via": "2.0 90afxxxxxxxxxxxxxxxxxxxxxxxxb74c.cloudfront.net (CloudFront)",
+            "X-Amz-Cf-Id": "ZtPsxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxXAdw==",
+            "X-Amzn-Trace-Id": "Root=1-5da9xxxxxxxxxxxxxxxxxxxxxxxx1a49",
+            "X-Forwarded-For": "216.x.x.235, 64.x.x.73",
+            "X-Forwarded-Port": "443",
+            "X-Forwarded-Proto": "https"
+        },
+        "multiValueHeaders": {
+            "Accept": [
+                "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3"
+            ],
+            "Accept-Encoding": [
+                "gzip, deflate, br"
+            ],
+            "Accept-Language": [
+                "en-US,en;q=0.9,fr;q=0.8"
+            ],
+            "cache-control": [
+                "max-age=0"
+            ],
+            "CloudFront-Forwarded-Proto": [
+                "https"
+            ],
+            "CloudFront-Is-Desktop-Viewer": [
+                "true"
+            ],
+            "CloudFront-Is-Mobile-Viewer": [
+                "false"
+            ],
+            "CloudFront-Is-SmartTV-Viewer": [
+                "false"
+            ],
+            "CloudFront-Is-Tablet-Viewer": [
+                "false"
+            ],
+            "CloudFront-Viewer-Country": [
+                "CA"
+            ],
+            "Host": [
+                "qf0xxxx7d0.execute-api.us-east-1.amazonaws.com"
+            ],
+            "sec-fetch-mode": [
+                "navigate"
+            ],
+            "sec-fetch-site": [
+                "null"
+            ],
+            "sec-fetch-user": [
+                "?1"
+            ],
+            "upgrade-insecure-requests": [
+                "1"
+            ],
+            "User-Agent": [
+                "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.90 Safari/537.36"
+            ],
+            "Via": [
+                "2.0 90afxxxxxxxxxxxxxxxxxxxxxxxxxb74c.cloudfront.net (CloudFront)"
+            ],
+            "X-Amz-Cf-Id": [
+                "ZtPsxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxXAdw=="
+            ],
+            "X-Amzn-Trace-Id": [
+                "Root=1-5da9xxxxxxxxxxxxxxxxxxxxxxxxxxxx1a49"
+            ],
+            "X-Forwarded-For": [ "216.x.x.235, 64.x.x.73" ],
+            "X-Forwarded-Port": [
+                "443"
+            ],
+            "X-Forwarded-Proto": [
+                "https"
+            ]
+        },
+        "queryStringParameters": null,
+        "multiValueQueryStringParameters": null,
+        "pathParameters": null,
+        "stageVariables": null,
+        "requestContext": {
+            "resourceId": "vuxx1a",
+            "resourcePath": "/integrate",
+            "httpMethod": "GET",
+            "extendedRequestId": "BwsxxxxxxxxxbsQ=",
+            "requestTime": "18/Oct/2019: 13: 45: 35 +0000",
+            "path": "/dev/integrate",
+            "accountId": "04xxxxxxxxx84",
+            "protocol": "HTTP/1.1",
+            "stage": "dev",
+            "domainPrefix": "qf0xxxx7d0",
+            "requestTimeEpoch": 1571406335066,
+            "requestId": "27fexxxxxxxxxxxxxxxxxxxxxxxxxxxxx884e",
+            "identity": {
+                "cognitoIdentityPoolId": null,
+                "accountId": null,
+                "cognitoIdentityId": null,
+                "caller": null,
+                "sourceIp": "216.x.x.235",
+                "principalOrgId": null,
+                "accessKey": null,
+                "cognitoAuthenticationType": null,
+                "cognitoAuthenticationProvider": null,
+                "userArn": null,
+                "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.90 Safari/537.36",
+                "user": null
+            },
+            "domainName": "qf0xxxx7d0.execute-api.us-east-1.amazonaws.com",
+            "apiId": "qf0xxxx7d0"
+        },
+        "body": null,
+        "isBase64Encoded": false
+    }
+]

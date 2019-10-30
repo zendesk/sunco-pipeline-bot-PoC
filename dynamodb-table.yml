@@ -1,0 +1,13 @@
+Resources:
+  integratedAppsTableResource:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: ${self:custom.dynamoDbAppIdTableName}
+      AttributeDefinitions:
+        - AttributeName: appId
+          AttributeType: S
+      KeySchema:
+        - AttributeName: appId
+          KeyType: HASH
+      # Set the capacity to auto-scale
+      BillingMode: PAY_PER_REQUEST

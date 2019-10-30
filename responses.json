@@ -1,0 +1,214 @@
+{
+    "demoDescription": "Self-service checkout (postback, carousel) & order status (quick-replies) with Bot-Human handoff",
+    "flows":{
+        "start": [
+            ">>msg>>welcome",
+            { "text": "How can I help you today?",
+                "actions": [
+                    {
+                        "type": "postback",
+                        "text": "🛍 I want to Shop!",
+                        "payload": "Shop"
+                    },
+                    {
+                        "type": "postback",
+                        "text": "📦 Existing order question",
+                        "payload": "Existing"
+                    },
+                    {
+                        "type": "postback",
+                        "text": "💸 Billing/Account question",
+                        "payload": "Account"
+                    },
+                    {
+                        "type": "postback",
+                        "text": "👩‍💻 Something else",
+                        "payload": "Other"
+                    }
+                
+            ]}
+        ],
+        "SHOP": [
+            "<< Shopping welcome TBD >>",
+            { "text": "What can I help you shop for today?",
+                "actions": [
+                    {
+                        "type": "postback",
+                        "text": "👜 Handbags",
+                        "payload": "Handbags"
+                    },
+                    {
+                        "type": "postback",
+                        "text": "👠 Shoes",
+                        "payload": "Shoes"
+                    },
+                    {
+                        "type": "postback",
+                        "text": "👔 Shirts",
+                        "payload": "Shirts"
+                    },
+                    {
+                        "type": "postback",
+                        "text": "👩‍💻‍ Something else",
+                        "payload": "Other"
+                    }
+                ]
+            }
+        ],
+        "HANDBAGS": [
+            "Here are some of our Handbags:",
+            { "type": "carousel",
+                "role": "appMaker",
+                "items": [
+                {
+                    "title": "Hermès Clemence Jypsière 34",
+                    "description": "Cafe Clemence leather Hermès Jypsière 34 with palladium-plated hardware, single adjustable flat shoulder strap",
+                    "mediaType": "image/jpeg",
+                    "mediaUrl": "https://product-images.therealreal.com/HER212113_2_enlarged.jpg?width=1500",
+                    "actions": [
+                    {
+                        "type": "postback",
+                        "text": "Buy now $4,723.05",
+                        "payload": "Buy"
+                    }
+                    ]
+                },
+                {
+                    "title": "Bottega Veneta",
+                    "description": "Black Intrecciato Nappa leather Bottega Veneta Olimpia shoulder bag with brushed gunmetal hardware.",
+                    "mediaType": "image/jpeg",
+                    "mediaUrl": "https://product-images.therealreal.com/BOT76175_1_enlarged.jpg?width=1500",
+                    "actions": [
+                    {
+                        "type": "postback",
+                        "text": "Buy now $2,017.42",
+                        "payload": "Buy"
+                    }
+                    ]
+                },
+                {
+                    "title": "Gucci Alligator Broadway Evening Bag",
+                    "description": "Gold embossed leather Gucci Alligator Broadway evening bag with gold-toned hardware.",
+                    "mediaType": "image/jpeg",
+                    "mediaUrl": "https://product-images.therealreal.com/GUC375020_3_enlarged.jpg?width=1500",
+                    "actions": [
+                    {
+                        "type": "postback",
+                        "text": "Buy now $937.86",
+                        "payload": "Buy"
+                    }
+                    ]
+                },
+                {
+                    "title": "Burberry Bridle Landscape Lynher Tote",
+                    "description": "Camel and multicolor House Check canvas Burberry Bridle Landscape Lynher tote with gold-toned hardware",
+                    "mediaType": "image/jpeg",
+                    "mediaUrl": "https://product-images.therealreal.com/BUR147648_1_enlarged.jpg?width=1500",
+                    "actions": [
+                    {
+                        "type": "postback",
+                        "text": "Buy now $937.86",
+                        "payload": "Buy"
+                    }
+                    ]
+                },
+                {
+                    "title": "Stella McCartney Shaggy Deer Falabella Tote",
+                    "description": "Pink shaggy deer vegan suede Stella McCartney Small Falabella Fold-Over tote with ruthenium hardward",
+                    "mediaType": "image/jpeg",
+                    "mediaUrl": "https://product-images.therealreal.com/STL106854_1_enlarged.jpg?width=1500",
+                    "actions": [
+                    {
+                        "type": "postback",
+                        "text": "Buy now $735.45",
+                        "payload": "Buy"
+                    }
+                    ]
+                }
+                ]
+            }
+        ],
+        "SHOES": [
+            ">>msg>>notImplemented",
+            "But if you had selected \"👜 Handbags\":",
+            ">>react>>Handbags"
+        ],
+        "SHIRTS": [
+            ">>msg>>notImplemented",
+            "But if you had selected \"👜 Handbags\":",
+            ">>react>>Handbags"
+        ],
+        "BUY": [
+            "Please enter your delivery information",
+            {   "type": "form",
+                "fields": [
+                    {
+                        "type": "text",
+                        "name": "Delivery address",
+                        "label": "Delivery address",
+                        "placeholder": "Type your address...",
+                        "minSize": 1,
+                        "maxSize": 50
+                    },
+                    {
+                        "type": "select",
+                        "name": "Delivery date",
+                        "label": "Delivery date",
+                        "options": [
+                            {
+                                "name": "Friday",
+                                "label": "Friday"
+                            },
+                            {
+                                "name": "Monday",
+                                "label": "Monday"
+                            },
+                            {
+                                "name": "Tuesday",
+                                "label": "Tuesday"
+                            }
+                        ]
+                    }
+                ]
+            }
+        ],
+        "EXISTING": [
+            "How can we help you with your Existing order? %[❓Delivery status](reply:Status) %[✏️Modify my order](reply:Modify) %[⚠️Report an issue](reply:Issue) %[👩‍💻‍ Something else](reply:Other)"
+        ],
+        "ACCOUNT": [
+            "Let me get one of my Humans to help with your account question",
+            ">>do>>escalate"
+        ],
+        "STATUS": [
+            "Your order is on-schedule to be delivered Tomorrow",
+            "![](https://media.smooch.io/apps/5daf5ab01f285700109f1c37/1t91WTG1dTUXnumVgIj15aQ6/Screen%20Shot%202019-10-24%20at%2011.37.43.png)"
+        ],
+        "MODIFY": [
+            "Let me get one of my Humans to help with your order update",
+            ">>do>>escalate"
+        ],
+        "ISSUE": [
+            "Let me get one of my Humans to help with your order issue",
+            ">>do>>escalate"
+        ],
+        "OTHER": [
+            ">>msg>>escalate",
+            ">>do>>escalate"
+        ],
+        "FORM_RESPOSNE": [
+            "Thanks for placing your order",
+            "We received this delivery information:",
+            ">>do>>echo"
+        ],
+        "RESET": [
+            "Sure! Starting over! 😁",
+            ">>react>>start"
+        ]
+    },
+    "reusables": {
+        "notImplemented": "🚔 Busted! We didn't implement this for this demo!",
+        "escalate": "Please stand by while I get one of Humans to help you ⏳",
+        "deescalate": "I hope my Human was able to help you resolve your query",
+        "welcome": "Hi! I'm your self-serve bot, here to help you find what you're looking for!"
+    }
+}
