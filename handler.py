@@ -208,10 +208,11 @@ class mySmooch:
         messageToSend = {
         # smooch-python key format
             "type": "text",
-            "role": "appMaker",
-            "name": "The One bot",
-            "avatar_url": "https://smooch.io/favicon.ico"
+            "role": "appMaker"
         }
+        messageToSend.update(self.responses['botPersona'])
+        #print(" > DEV: Updated base msg: %s" % messageToSend)
+        
         # TODO: check for key collisions?
         # x.update(y) will overwrite x with conflicting values from y
         messageToSend.update(messageObj)
@@ -251,8 +252,8 @@ class mySmooch:
             print("Excecution complete (message passed through) - returning: %s" % result)
             return result
 
-    def deescalate(self):
-        self.sendMessage(self.responses['reusables']['deescalate'])
+    def resetConvo(self, response):
+        self.sendMessage(self.responses['reusables'][response])
         self.updateAppUser({ "escalated":False, "flow":False })
         #TODO: re-send welcome message ?
         result = { "statusCode": 200, "body": "escalation/flow flags cleared" }
@@ -292,8 +293,10 @@ class mySmooch:
                 if cmdArr[1] == 'do':           # special command
                     if cmdArr[2] == 'echo':     # echo user message
                         self.sendMessage("%s" % userText)
-                    if cmdArr[2] == 'escalate': # escalate to bus.sys.
+                    elif cmdArr[2] == 'escalate': # escalate to bus.sys.
                         self.escalate(nonce)
+                    elif cmdArr[2].startswith('sleep'): # send reusable message
+                        sleep(int(cmdArr[2][5:]))
                     else:   # backend behaviour
                         raise NotImplementedError("No handling for 'do' action (yet) in '%s'" % '>>'.join(cmdArr))
                 elif cmdArr[1] == 'react': # simulate user input
@@ -410,8 +413,10 @@ def pipelineAppUserEvent(event, context):
         properties['flow'] = ""
 
     userText = smoochApi.getUserText(bodyData)
-    if userText in ['RESET', 'DEESCALATE', 'RESTART']:
-        return smoochApi.deescalate()
+    if userText in ['RESET', 'RESTART']:
+        return smoochApi.resetConvo("welcome")
+    elif userText in [ 'DEESCALATE' ]:
+        return smoochApi.resetConvo("deescalate")
 
     if 'escalated' in properties.keys() and properties['escalated']:
         if lastSeen < ( datetime.utcnow() - timedelta(hours=1) ):    # >1h inactive, reset escalation state

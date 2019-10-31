@@ -17,7 +17,7 @@
         <tr><td>a</td><td>table</td><td>!!</td></tr>
         </table>
         <script>
-            Smooch.init({ appId: appId }).then(
+            Smooch.init({ appId: appId, notificationChannelPromptEnabled: false, browserStorage: "sessionStorage" }).then(
                 function() {
                     // Your code after init is complete
                 },
