@@ -242,6 +242,9 @@ class mySmooch:
         print("Excecution complete (escalation unset) - returning: %s" % passthroughResult)
         return passthroughResult
 
+    def deescalate(self):
+        self.updateAppUser({ "escalated":False })
+
     def passthroughEscalated(self, nonce):
         continueHdr = { "Authorization": "Bearer %s" % nonce}
         passthruResp = requests.post(notificationEndpoints['continueUrl'], headers=continueHdr)
@@ -252,8 +255,9 @@ class mySmooch:
             print("Excecution complete (message passed through) - returning: %s" % result)
             return result
 
-    def resetConvo(self, response):
-        self.sendMessage(self.responses['reusables'][response])
+    def resetConvo(self, response, nonce=None):
+        #self.sendMessage(self.responses['reusables'][response])
+        self.sendResponses(None, response, nonce)
         self.updateAppUser({ "escalated":False, "flow":False })
         #TODO: re-send welcome message ?
         result = { "statusCode": 200, "body": "escalation/flow flags cleared" }
@@ -298,7 +302,7 @@ class mySmooch:
                     elif cmdArr[2].startswith('sleep'): # send reusable message
                         sleep(int(cmdArr[2][5:]))
                     else:   # backend behaviour
-                        raise NotImplementedError("No handling for 'do' action (yet) in '%s'" % '>>'.join(cmdArr))
+                        raise NotImplementedError("No handling for this 'do' action (yet) in '%s'" % '>>'.join(cmdArr))
                 elif cmdArr[1] == 'react': # simulate user input
                     #self.sendResponses(flow, '>>'.join(cmdArr[2:]))
                     self.sendResponses('>>'.join(cmdArr[2:]).upper(),'>>'.join(cmdArr[2:]), nonce)
@@ -414,7 +418,7 @@ def pipelineAppUserEvent(event, context):
 
     userText = smoochApi.getUserText(bodyData)
     if userText in ['RESET', 'RESTART']:
-        return smoochApi.resetConvo("welcome")
+        return smoochApi.resetConvo("welcome", nonce)
     elif userText in [ 'DEESCALATE' ]:
         return smoochApi.resetConvo("deescalate")
 
