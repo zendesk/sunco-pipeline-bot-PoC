@@ -3,140 +3,61 @@
     "flows":{
         "start": [
             ">>msg>>welcome",
-            { "text": "How can I help you today?",
-                "actions": [
-                    {
-                        "type": "postback",
-                        "text": "🛍 I want to Shop!",
-                        "payload": "Shop"
-                    },
-                    {
-                        "type": "postback",
-                        "text": "📦 Existing order question",
-                        "payload": "Existing"
-                    },
-                    {
-                        "type": "postback",
-                        "text": "💸 Billing/Account question",
-                        "payload": "Account"
-                    },
-                    {
-                        "type": "postback",
-                        "text": "👩‍💻 Something else",
-                        "payload": "Other"
-                    }
-                
-            ]}
+            ">>react>>menu"
         ],
-        "SHOP": [
-            "<< Shopping welcome TBD >>",
-            { "text": "What can I help you shop for today?",
-                "actions": [
-                    {
-                        "type": "postback",
-                        "text": "👜 Handbags",
-                        "payload": "Handbags"
-                    },
-                    {
-                        "type": "postback",
-                        "text": "👠 Shoes",
-                        "payload": "Shoes"
-                    },
-                    {
-                        "type": "postback",
-                        "text": "👔 Shirts",
-                        "payload": "Shirts"
-                    },
-                    {
-                        "type": "postback",
-                        "text": "👩‍💻‍ Something else",
-                        "payload": "Other"
-                    }
-                ]
-            }
+        "START":[
+            ">>msg>>welcome",
+            ">>react>>menu"
         ],
-        "HANDBAGS": [
-            "Here are some of our Handbags:",
+        "MENU": [
+            { "text": "Hi! What do you need help with? %[💰 Sales](postback:Sales) %[❓ Support](postback:Support) %[👩‍💻 Agent](postback:Agent)" }
+        ],
+        "SALES": [
+            ">>msg>>notImplemented",
+            "But if you had selected 'Support':",
+            ">>react>>Support"
+        ],
+        "SUPPORT": [
+            "What seems to be the problem? %[I can’t login to my account!](reply:Login) %[I need help with payments](reply:Payments) %[Something else](reply:Agent)"
+        ],
+        "PAYMENTS": [
+            ">>msg>>notImplemented",
+            "But if you had selected 'Login':",
+            ">>react>>Login"
+        ],
+        "LOGIN": [
+            "Here are 2 articles that may help you!",
             { "type": "carousel",
                 "role": "appMaker",
                 "items": [
                 {
-                    "title": "Hermès Clemence Jypsière 34",
-                    "description": "Cafe Clemence leather Hermès Jypsière 34 with palladium-plated hardware, single adjustable flat shoulder strap",
-                    "mediaType": "image/jpeg",
-                    "mediaUrl": "https://product-images.therealreal.com/HER212113_2_enlarged.jpg?width=1500",
+                    "title": "Your Account",
+                    "description": "Also in this section\n-Logging in\n-Managing billing\n-Managing your account\n-Account security\n-Pausing/closing your store...",
+                    "mediaType": "image/png",
+                    "mediaUrl": "https://app.smooch.io/favicon.ico",
                     "actions": [
-                    {
-                        "type": "postback",
-                        "text": "Buy now $4,723.05",
-                        "payload": "Buy"
-                    }
+                        {
+                            "type": "link",
+                            "text": "Read more...",
+                            "uri": "https://support.zendesk.com/hc/en-us/articles/228460167-I-can-t-log-into-the-Zendesk-Support-Help-Center"
+                        }
                     ]
                 },
                 {
-                    "title": "Bottega Veneta",
-                    "description": "Black Intrecciato Nappa leather Bottega Veneta Olimpia shoulder bag with brushed gunmetal hardware.",
-                    "mediaType": "image/jpeg",
-                    "mediaUrl": "https://product-images.therealreal.com/BOT76175_1_enlarged.jpg?width=1500",
+                    "title": "Login trouble",
+                    "description": "On this page\n-Enabling two-step authentication\n-Logging in with two-step authentication\n-Disabling two-step authentication...",
+                    "mediaType": "image/png",
+                    "mediaUrl": "https://app.smooch.io/favicon.ico",
                     "actions": [
-                    {
-                        "type": "postback",
-                        "text": "Buy now $2,017.42",
-                        "payload": "Buy"
-                    }
-                    ]
-                },
-                {
-                    "title": "Gucci Alligator Broadway Evening Bag",
-                    "description": "Gold embossed leather Gucci Alligator Broadway evening bag with gold-toned hardware.",
-                    "mediaType": "image/jpeg",
-                    "mediaUrl": "https://product-images.therealreal.com/GUC375020_3_enlarged.jpg?width=1500",
-                    "actions": [
-                    {
-                        "type": "postback",
-                        "text": "Buy now $937.86",
-                        "payload": "Buy"
-                    }
-                    ]
-                },
-                {
-                    "title": "Burberry Bridle Landscape Lynher Tote",
-                    "description": "Camel and multicolor House Check canvas Burberry Bridle Landscape Lynher tote with gold-toned hardware",
-                    "mediaType": "image/jpeg",
-                    "mediaUrl": "https://product-images.therealreal.com/BUR147648_1_enlarged.jpg?width=1500",
-                    "actions": [
-                    {
-                        "type": "postback",
-                        "text": "Buy now $937.86",
-                        "payload": "Buy"
-                    }
-                    ]
-                },
-                {
-                    "title": "Stella McCartney Shaggy Deer Falabella Tote",
-                    "description": "Pink shaggy deer vegan suede Stella McCartney Small Falabella Fold-Over tote with ruthenium hardward",
-                    "mediaType": "image/jpeg",
-                    "mediaUrl": "https://product-images.therealreal.com/STL106854_1_enlarged.jpg?width=1500",
-                    "actions": [
-                    {
-                        "type": "postback",
-                        "text": "Buy now $735.45",
-                        "payload": "Buy"
-                    }
+                        {
+                            "type": "link",
+                            "text": "Read more...",
+                            "uri": "https://support.zendesk.com/hc/en-us/articles/203663776-Configuring-end-user-access-and-sign-in"
+                        }
                     ]
                 }
                 ]
             }
-        ],
-        "SHOES": [
-            ">>msg>>notImplemented",
-            "But if you had selected \"👜 Handbags\":",
-            ">>react>>Handbags"
-        ],
-        "SHIRTS": [
-            ">>msg>>notImplemented",
-            "But if you had selected \"👜 Handbags\":",
-            ">>react>>Handbags"
         ],
         "BUY": [
             "Please enter your delivery information",
@@ -172,33 +93,27 @@
                 ]
             }
         ],
-        "EXISTING": [
-            "How can we help you with your Existing order? %[❓Delivery status](reply:Status) %[✏️Modify my order](reply:Modify) %[⚠️Report an issue](reply:Issue) %[👩‍💻‍ Something else](reply:Other)"
+        "LEARN": [],
+        "CONTACT": [
+            "Let me know what you’re looking to do… %[Signup for notifications](reply:Notifications) %[Update Subscription](reply:Subscription) %[Talk to a Human](reply:Human)"
         ],
-        "ACCOUNT": [
-            "Let me get one of my Humans to help with your account question",
-            ">>do>>escalate"
+        "NOTIFICATIONS": [
+            "I can help you do that! I’ve gone ahead and subscribed you to product feature notifications.",
+            "We’ll ping you on the devices you’ve registered as contact methods"
         ],
-        "STATUS": [
-            "Your order is on-schedule to be delivered Tomorrow",
-            "![](https://media.smooch.io/apps/5daf5ab01f285700109f1c37/1t91WTG1dTUXnumVgIj15aQ6/Screen%20Shot%202019-10-24%20at%2011.37.43.png)"
+        "GIF": [
+            "Anything catch your eye? ![](https://media3.giphy.com/media/8YQgUGfsCdFDdvP5Le/200.webp?cid=790b7611a3434fd26d52438f9d9176dc799ea41f6ebb70b4&rid=200.webp)"
         ],
-        "MODIFY": [
-            "Let me get one of my Humans to help with your order update",
-            ">>do>>escalate"
-        ],
-        "ISSUE": [
-            "Let me get one of my Humans to help with your order issue",
-            ">>do>>escalate"
-        ],
-        "OTHER": [
+        "AGENT": [
             ">>msg>>escalate",
             ">>do>>escalate"
         ],
         "FORM_RESPOSNE": [
             "Thanks for placing your order",
             "We received this delivery information:",
-            ">>do>>echo"
+            ">>do>>echo",
+            "Can I help you with anything else?",
+            ">>react>>menu"
         ],
         "RESET": [
             "Sure! Starting over! 😁",
@@ -206,9 +121,13 @@
         ]
     },
     "reusables": {
-        "notImplemented": "🚔 Busted! We didn't implement this for this demo!",
+        "notImplemented": "Busted! We didn't implement this for this demo! 😅",
         "escalate": "Please stand by while I get one of Humans to help you ⏳",
         "deescalate": "I hope my Human was able to help you resolve your query",
-        "welcome": "Hi! I'm your self-serve bot, here to help you find what you're looking for!"
+        "welcome": "Welcome! I'm your friendly chatbot!"
+    },
+    "botPersona":{
+        "name": "The One bot",
+        "avatar_url": "https://app.smooch.io/favicon.ico"
     }
 }
