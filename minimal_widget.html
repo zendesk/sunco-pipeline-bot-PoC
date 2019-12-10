@@ -20,6 +20,8 @@
             Smooch.init({ appId: appId, notificationChannelPromptEnabled: false, browserStorage: "sessionStorage" }).then(
                 function() {
                     // Your code after init is complete
+                    Smooch.open();
+                    Smooch.startConversation();
                 },
                 function(err) {
                     // Something went wrong during initialization

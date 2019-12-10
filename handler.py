@@ -237,13 +237,20 @@ class mySmooch:
         passthroughResult = self.passthroughEscalated(nonce)
         #self.sendMessage({"text": "Please stand by while I get one of Humans to help you ⏳"})
         self.updateAppUser({ "escalated":True })
+        #self.sendResponses(">>msg>>escalate", nonce) # << gets caught in `start` fallback instead of trying to process the >>msg>> command
 
         #TODO: return something else if escalation flag update breaks?
-        print("Excecution complete (escalation unset) - returning: %s" % passthroughResult)
+        print("Excecution complete (escalation set) - returning: %s" % passthroughResult)
         return passthroughResult
 
     def deescalate(self):
+        #self.sendMessage({"text": "Please stand by while I get one of Humans to help you ⏳"})
         self.updateAppUser({ "escalated":False })
+        #self.sendResponses(">>msg>>escalate", nonce) # << gets caught in `start` fallback instead of trying to process the >>msg>> command
+
+        #TODO: return something else if escalation flag update breaks?
+        print("Excecution complete (escalation unset) - returning: %s" % passthroughResult)
+        return True
 
     def passthroughEscalated(self, nonce):
         continueHdr = { "Authorization": "Bearer %s" % nonce}
@@ -256,30 +263,36 @@ class mySmooch:
             return result
 
     def resetConvo(self, response, nonce=None):
-        #self.sendMessage(self.responses['reusables'][response])
-        self.sendResponses(None, response, nonce)
         self.updateAppUser({ "escalated":False, "flow":False })
+        #self.sendMessage(self.responses['reusables'][response])
+        self.sendResponses(None, response)  # TODO: needed?
         #TODO: re-send welcome message ?
         result = { "statusCode": 200, "body": "escalation/flow flags cleared" }
-        print("Excecution complete (escalation unset) - returning: %s" % result)
+        print("Escalation unset - returning: %s" % result)
         return result
 
-    def sendResponses(self, flow, userText, nonce, data=None, msgType=None):
-        print("Starting sendResponses(): '%s' & '%s'" % (flow, userText))
+    #def sendResponses(self, flow, userText, nonce, data=None, msgType=None):
+    def sendResponses(self, userText, nonce=None, data=None, msgType=None):
+        #print("Starting sendResponses(): '%s' & '%s'" % (flow, userText))
+        print("Starting sendResponses(): '%s'" % (userText))
 
         results = []
         #starting = False
 
         if userText in self.responses['flows'].keys(): # Flow name in userText
-            flow = userText
-            self.updateAppUser({ "flow":userText })
-            #starting = True
-        elif flow in self.responses['flows'].keys(): # Flow found
-            pass
-        else:   # Flow not found - use default
-            print(" > WARNING: Unknown flow %s - using 'start' instead." % flow)
-            flow = 'start'
-            #starting = True
+            input = userText
+        #     flow = userText
+        #     self.updateAppUser({ "flow":userText })
+        #     #starting = True
+        # elif flow in self.responses['flows'].keys(): # Flow found
+        #     pass
+        # else:   # Flow not found - use default
+        else:   # Response not found - use default
+            #print(" > WARNING: Unknown flow %s - using 'start' instead." % flow)
+            print(" > WARNING: Unknown input %s - using 'start' instead." % userText)
+            input = 'start'
+            # flow = 'start'
+            # starting = True
 
         # if userText not in self.responses['flows'][flow].keys(): # Branch not found
         #     userText = 'start'
@@ -287,29 +300,38 @@ class mySmooch:
         #         print(" > WARNING: Unknown branch %s for flow %s - using 'start' instead." % (userText, flow))
 
         if msgType == 'formResponse':
-            flow = 'FORM_RESPOSNE'
+            # flow = 'FORM_RESPOSNE'
+            input = 'FORM_RESPOSNE'
 
         #for msg in self.responses['flows'][flow][userText]:    # Iterate responses
-        for msg in self.responses['flows'][flow]:    # Iterate responses
+        #for msg in self.responses['flows'][flow]:    # Iterate responses
+        for msg in self.responses['flows'][input]:    # Iterate responses
             cmdArr = msg.split('>>') if type(msg) is str else None
             if cmdArr is not None and len(cmdArr) >= 3 and msg.startswith('>>'):   # Process '>>' commands
                 print("Processing command: %s" % msg)
                 if cmdArr[1] == 'do':           # special command
                     if cmdArr[2] == 'echo':     # echo user message
-                        self.sendMessage("%s" % userText)
+                        results.append(self.sendMessage("%s" % userText))
+                    elif cmdArr[2] == 'reset': # escalate to bus.sys.
+                        results.append(self.resetConvo())
                     elif cmdArr[2] == 'escalate': # escalate to bus.sys.
-                        self.escalate(nonce)
-                    elif cmdArr[2].startswith('sleep'): # send reusable message
+                        #TODO: check nonce != None; can only handoff from pipeline bot mode
+                        results.append(self.escalate(nonce))
+                    elif cmdArr[2] == 'deescalate': # escalate to bus.sys.
+                        results.append(self.deescalate())
+                    elif cmdArr[2].startswith('sleep'): # literally, sleep
                         sleep(int(cmdArr[2][5:]))
+                        results.append("Slept %ss" % int(cmdArr[2][5:]))
                     else:   # backend behaviour
                         raise NotImplementedError("No handling for this 'do' action (yet) in '%s'" % '>>'.join(cmdArr))
                 elif cmdArr[1] == 'react': # simulate user input
                     #self.sendResponses(flow, '>>'.join(cmdArr[2:]))
-                    self.sendResponses('>>'.join(cmdArr[2:]).upper(),'>>'.join(cmdArr[2:]), nonce)
+                    results.append(self.sendResponses('>>'.join(cmdArr[2:]).upper(),'>>'.join(cmdArr[2:]), nonce))
+                    #TODO: And this was for...?
                 elif cmdArr[1] == 'msg': # send reusable message
                     if cmdArr[2] in self.responses['reusables'].keys():
                         #self.sendMessage({"text": "%s" % self.responses['reusables'][cmdArr[2]]})
-                        self.sendMessage(self.responses['reusables'][cmdArr[2]])
+                        results.append(self.sendMessage(self.responses['reusables'][cmdArr[2]]))
                     else:
                         raise KeyError("command error: reusable message '%s' not found" % cmdArr[2])
                 else:
@@ -357,31 +379,29 @@ class mySmooch:
             raise Exception("Expecting `message` or `postback` in response")
 
         #return userText
+    
+    @staticmethod
+    def getEventTypeOrigin(data):
+        #TODO: needed? (reply on presence or not of Nonce?)
+        if 'nonce' in data.keys():
+            evtOrigin = "pipeline"
+            #nonce = data['nonce']
+        else:
+            evtOrigin = "webhook"
+            #nonce = None
 
-def pipelineAppUserEvent(event, context):
-    #global bodyData
-    #print("New request: %s" % event)
-    bodyData = json.loads(event['body'])
-    print("Starting newPipelineMessage() with %s" % bodyData)
+        evtTrigger = data['trigger']
 
-    #TODO: test required values in payload: {
-    #   "": ['trigger', 'app', 'appUser', 'message', 'nonce'],
-    #   "app": ['_id'],
-    #   "appUser": ['_id'],
-    #   "message": ['text'] 
-    #if not test_contents(bodyData, structures['message:appUser']):
+        if evtTrigger == "message:appUser":
+            evtType = data['message']['type']
+        elif evtTrigger == "postback":
+            evtType = "postback"
+        else:
+            raise ValueError("Unsupported trigger: %s" % evtTrigger)
 
-    appId = bodyData['app']['_id']
-    appUserId = bodyData['appUser']['_id']
-    trigger = bodyData['trigger']
-    nonce = bodyData['nonce']
-    if trigger == "message:appUser":
-        messageType = bodyData['message']['type']
-    elif trigger == "postback":
-        messageType = "postback"
-    else:
-        raise ValueError("Unsupported trigger: %s" % trigger)
+        return evtType, evtOrigin
 
+def lookupAppInDb(appId):
     # Lookup supported app in table
     dynamodb = resource("dynamodb")
     appsTable = dynamodb.Table(os.environ['appTableName'])
@@ -396,11 +416,35 @@ def pipelineAppUserEvent(event, context):
             #print("GetItem succeeded %s (App %s is subscribed)" % (appCreds, appId))
         else:
             print(" > ERROR: No 'Item' in db response: %s" % response)
-            return { "statusCode": 403, "body": " > Forbidden: appId not registered!" }
+            raise ValueError(json.dumps({"statusCode": 403, "body": " > Forbidden: appId not registered!"}))
+
+    return appCreds
+
+def pipelineAppUserEvent(event, context):
+    #global bodyData
+    #print("New request: %s" % event)
+    bodyData = json.loads(event['body'])
+    print("Starting pipelineAppUserEvent() with %s" % bodyData) # DEV
+
+    #TODO: test required values in payload: {
+    #   "": ['trigger', 'app', 'appUser', 'message', 'nonce'],
+    #   "app": ['_id'],
+    #   "appUser": ['_id'],
+    #   "message": ['text'] 
+    #if not test_contents(bodyData, structures['message:appUser']):
+
+    appId = bodyData['app']['_id']
+    appUserId = bodyData['appUser']['_id']
+    nonce = bodyData['nonce'] if 'nonce' in bodyData.keys() else None
+
+    # get parse event info
+    eventType, eventOrigin = mySmooch.getEventTypeOrigin(bodyData)
+
+    # Lookup supported app in table
+    appCreds = lookupAppInDb(appId)
 
     # Verify webhook signature
-    if 'X-API-Key' not in event['headers'].keys() or \
-        event['headers']['X-API-Key'] != appCreds['processorSecret']:
+    if 'X-API-Key' not in event['headers'].keys() or event['headers']['X-API-Key'] != appCreds['processorSecret']:
         print(" %s == %s" % (event['headers']['X-API-Key'], appCreds['processorSecret']))
         print("Types: %s, %s" % (type(event['headers']['X-API-Key']), type(appCreds['processorSecret'])))
         result = { "statusCode": 400, "body": " > Bad Request"}
@@ -412,29 +456,31 @@ def pipelineAppUserEvent(event, context):
 
     # TODO: check escalation flag + timestamp
     properties, lastSeen = smoochApi.getAppUserInfo()
-    print("appUser properties: %s" % properties)
-    if 'flow' not in properties.keys():
-        properties['flow'] = ""
+    print("appUser properties: %s" % properties)    # DEV
+    # if 'flow' not in properties.keys():
+    #     properties['flow'] = ""
 
+    # Catch master keywords
     userText = smoochApi.getUserText(bodyData)
-    if userText in ['RESET', 'RESTART']:
-        return smoochApi.resetConvo("welcome", nonce)
-    elif userText in [ 'DEESCALATE' ]:
-        return smoochApi.resetConvo("deescalate")
-
+    # if userText in ['RESET', 'RESTART']:
+    #     return smoochApi.resetConvo(">>react>>start", nonce)
+    # elif userText in [ 'DEESCALATE', 'BOT' ]:
+    #     return smoochApi.resetConvo("deescalate")
+    # elif 'escalated' in properties.keys() and properties['escalated']:
     if 'escalated' in properties.keys() and properties['escalated']:
         if lastSeen < ( datetime.utcnow() - timedelta(hours=1) ):    # >1h inactive, reset escalation state
-            return smoochApi.deescalate()
+            return smoochApi.resetConvo(">>msg>>welcome")
         else:
             return smoochApi.passthroughEscalated(nonce)
-    elif userText in [ 'ESCALATE', 'HUMAN', 'HELP']:
-        return smoochApi.escalate(nonce) 
-    # elif 'flow' not in properties.keys() or not properties['flow']:
-    #     # Unspecified flow - send default
-    #     return smoochApi.sendResponses('start', userText)
+    # elif userText in [ 'ESCALATE', 'HUMAN', 'HELP']:
+    #     return smoochApi.escalate(nonce) 
+    # # elif 'flow' not in properties.keys() or not properties['flow']:
+    # #     # Unspecified flow - send default
+    # #     return smoochApi.sendResponses('start', userText)
     else:
         #print("(372) hoping for a known flow: %s" % bodyData)
-        return smoochApi.sendResponses(properties['flow'], userText, nonce, msgType=messageType)
+        #return smoochApi.sendResponses(properties['flow'], userText, nonce, msgType=messageType)
+        return smoochApi.sendResponses(userText, nonce, msgType=eventType)
 
     # body = {
     #     "message": "Go Serverless v1.0! Your function executed successfully!",
@@ -446,7 +492,8 @@ def pipelineAppUserEvent(event, context):
     #     "body": json.dumps(body)
     # }
 
-    # return response
+def handleWebhook():
+    pass
 
 def linter_smoketest():
     purposely_unused_variable = None

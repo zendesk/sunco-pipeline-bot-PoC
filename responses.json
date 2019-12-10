@@ -105,8 +105,7 @@
             "Anything catch your eye? ![](https://media3.giphy.com/media/8YQgUGfsCdFDdvP5Le/200.webp?cid=790b7611a3434fd26d52438f9d9176dc799ea41f6ebb70b4&rid=200.webp)"
         ],
         "AGENT": [
-            ">>msg>>escalate",
-            ">>do>>escalate"
+            ">>react>>escalate"
         ],
         "FORM_RESPOSNE": [
             "Thanks for placing your order",
@@ -118,6 +117,15 @@
         "RESET": [
             "Sure! Starting over! 😁",
             ">>react>>start"
+        ],
+        "ESCALATE": [
+            ">>msg>>escalate",
+            ">>do>>escalate"
+        ],
+        "DEESCALATE": [
+            ">>msg>>deescalate",
+            "Can I help you with anything else?",
+            ">>react>>menu"
         ]
     },
     "reusables": {
