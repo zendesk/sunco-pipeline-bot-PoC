@@ -1,141 +1,204 @@
 {
-    "demoDescription": "Self-service checkout (postback, carousel) & order status (quick-replies) with Bot-Human handoff",
-    "flows":{
-        "start": [
+    "demoDescription": "Triage Bot with Human handoff",
+    "responses":{
+        "default": [
             ">>msg>>welcome",
-            ">>react>>menu"
+            ">>react>>listpicker"
         ],
-        "START":[
-            ">>msg>>welcome",
-            ">>react>>menu"
-        ],
-        "MENU": [
-            { "text": "Hi! What do you need help with? %[💰 Sales](postback:Sales) %[❓ Support](postback:Support) %[👩‍💻 Agent](postback:Agent)" }
-        ],
-        "SALES": [
-            ">>msg>>notImplemented",
-            "But if you had selected 'Support':",
-            ">>react>>Support"
-        ],
-        "SUPPORT": [
-            "What seems to be the problem? %[I can’t login to my account!](reply:Login) %[I need help with payments](reply:Payments) %[Something else](reply:Agent)"
-        ],
-        "PAYMENTS": [
-            ">>msg>>notImplemented",
-            "But if you had selected 'Login':",
-            ">>react>>Login"
-        ],
-        "LOGIN": [
-            "Here are 2 articles that may help you!",
-            { "type": "carousel",
+        "LISTPICKER": [
+            {   "text": "Sending Triage ListPicker to Apple User",
+                "type": "text",
                 "role": "appMaker",
-                "items": [
-                {
-                    "title": "Your Account",
-                    "description": "Also in this section\n-Logging in\n-Managing billing\n-Managing your account\n-Account security\n-Pausing/closing your store...",
-                    "mediaType": "image/png",
-                    "mediaUrl": "https://app.smooch.io/favicon.ico",
-                    "actions": [
-                        {
-                            "type": "link",
-                            "text": "Read more...",
-                            "uri": "https://support.zendesk.com/hc/en-us/articles/228460167-I-can-t-log-into-the-Zendesk-Support-Help-Center"
+                "override": {
+                  "apple": {
+                    "payload": {
+                      "type": "interactive",
+                      "interactiveData": {
+                        "bid": "com.apple.messages.MSMessageExtensionBalloonPlugin:0000000000:com.apple.icloud.apps.messages.business.extension",
+                        "data": {
+                          "version": "1.0",
+                          "requestIdentifier": "",
+                          "listPicker": {
+                            "sections": [
+                              {
+                                "title": "Support Menu",
+                                "order": 0,
+                                "items": [
+                                  {
+                                    "title": "View my TV subscription",
+                                    "order": 0,
+                                    "identifier": "view-subscriptions-tv"
+                                  },
+                                  {
+                                    "title": "Change my programming",
+                                    "order": 1,
+                                    "identifier": "update-programming"
+                                  },
+                                  {
+                                    "title": "Pay my bill",
+                                    "order": 2,
+                                    "identifier": "bill-payment"
+                                  },
+                                  {
+                                    "title": "Find a store",
+                                    "order": 3,
+                                    "identifier": "find-store"
+                                  },
+                                  {
+                                    "title": "Something else",
+                                    "order": 4,
+                                    "identifier": "get-help"
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        },
+                        "receivedMessage": {
+                          "style": "small",
+                          "title": "Help Picker",
+                          "subtitle": "What would you like to do?",
+                          "imageIdentifier": "1"
+                        },
+                        "replyMessage": {
+                          "style": "small",
+                          "title": "Selected option",
+                          "subtitle": ">Subtitle<"
                         }
-                    ]
-                },
-                {
-                    "title": "Login trouble",
-                    "description": "On this page\n-Enabling two-step authentication\n-Logging in with two-step authentication\n-Disabling two-step authentication...",
-                    "mediaType": "image/png",
-                    "mediaUrl": "https://app.smooch.io/favicon.ico",
-                    "actions": [
-                        {
-                            "type": "link",
-                            "text": "Read more...",
-                            "uri": "https://support.zendesk.com/hc/en-us/articles/203663776-Configuring-end-user-access-and-sign-in"
-                        }
-                    ]
-                }
-                ]
-            }
-        ],
-        "BUY": [
-            "Please enter your delivery information",
-            {   "type": "form",
-                "fields": [
-                    {
-                        "type": "text",
-                        "name": "Delivery address",
-                        "label": "Delivery address",
-                        "placeholder": "Type your address...",
-                        "minSize": 1,
-                        "maxSize": 50
-                    },
-                    {
-                        "type": "select",
-                        "name": "Delivery date",
-                        "label": "Delivery date",
-                        "options": [
-                            {
-                                "name": "Friday",
-                                "label": "Friday"
-                            },
-                            {
-                                "name": "Monday",
-                                "label": "Monday"
-                            },
-                            {
-                                "name": "Tuesday",
-                                "label": "Tuesday"
-                            }
-                        ]
+                      }
                     }
-                ]
+                  }
+                }
             }
         ],
-        "LEARN": [],
-        "CONTACT": [
-            "Let me know what you’re looking to do… %[Signup for notifications](reply:Notifications) %[Update Subscription](reply:Subscription) %[Talk to a Human](reply:Human)"
+        "GET-HELP": [ "What seems to be the issue?"
         ],
-        "NOTIFICATIONS": [
-            "I can help you do that! I’ve gone ahead and subscribed you to product feature notifications.",
-            "We’ll ping you on the devices you’ve registered as contact methods"
+        "VIEW-SUBS-TV": [ ">>msg>>notImplemented",
+          "But if you had selected 'Support':",
+          ">>react>>GET-HELP"
         ],
-        "GIF": [
-            "Anything catch your eye? ![](https://media3.giphy.com/media/8YQgUGfsCdFDdvP5Le/200.webp?cid=790b7611a3434fd26d52438f9d9176dc799ea41f6ebb70b4&rid=200.webp)"
+        "UPDATE-PROGRAMMING": [ ">>msg>>notImplemented",
+          "But if you had selected 'Support':",
+          ">>react>>GET-HELP"
         ],
-        "AGENT": [
-            ">>react>>escalate"
+        "BILL-PAYMENT": [ ">>msg>>notImplemented",
+          "But if you had selected 'Support':",
+          ">>react>>GET-HELP"
         ],
-        "FORM_RESPOSNE": [
-            "Thanks for placing your order",
-            "We received this delivery information:",
-            ">>do>>echo",
-            "Can I help you with anything else?",
-            ">>react>>menu"
+        "FIND-STORE": [ ">>msg>>notImplemented",
+          "But if you had selected 'Support':",
+          ">>react>>GET-HELP"
         ],
-        "RESET": [
-            "Sure! Starting over! 😁",
+        "GIF": [ "Hold on and guess who’s behind this mask while I pull up your account. ![](https://media.giphy.com/media/JUAwDx1uGmZTdJ2dfL/giphy.gif)"
+        ],
+        "TIMEPICKER": [
+          { "text": "Sending Support Appointment TimePicker to Apple User",
+            "role": "appMaker",
+            "override": {
+                "apple": {
+                    "payload": {
+                        "interactiveData": {
+                            "bid": "com.apple.messages.MSMessageExtensionBalloonPlugin:0000000000:com.apple.icloud.apps.messages.business.extension",
+                            "data": {
+                                "event": {
+                                    "identifier": "reservation-id",
+                                    "timeslots": [
+                                        {
+                                            "duration": 3600,
+                                            "identifier": "7-am",
+                                            "startTime": "2018-10-24T07:00+0000"
+                                        },
+                                        {
+                                            "duration": 3600,
+                                            "identifier": "8-am",
+                                            "startTime": "2018-10-24T08:00+0000"
+                                        }
+                                    ],
+                                    "timezoneOffset": 400,
+                                    "title": "Available Reservations"
+                                },
+                                "mspVersion": "1.0",
+                                "requestIdentifier": "appointment-selector-1"
+                            },
+                            "receivedMessage": {
+                                "style": "icon",
+                                "title": "Make a reservation"
+                            },
+                            "replyMessage": {
+                                "style": "icon",
+                                "title": "Your reservation"
+                            }
+                        },
+                        "type": "interactive"
+                    }
+                }
+            }
+          }
+        ],
+        "TIMEPICKER_RESP": [ "Excellent choice! I'll remind you when it’s time for your appointment.",
+          ">>do>>sleep2",
+          "![](https://gph.is/19pf4st)",
+          ">>do>>sleep5",
+          "Hello again!\nIt's time for your appointment!",
+          "Let me know when you're ready to be connected to an agent."
+        ],
+        "AGENT": [ ">>react>>escalate"
+        ],
+        "HUMAN": [ ">>react>>escalate"
+        ],
+        "RESET": [ "Sure! Starting over! 😁",
             ">>react>>start"
         ],
-        "ESCALATE": [
-            ">>msg>>escalate",
+        "RESTART": [ ">>react>>reset"
+        ],
+        "ESCALATE": [ ">>msg>>escalate",
             ">>do>>escalate"
         ],
-        "DEESCALATE": [
-            ">>msg>>deescalate",
+        "BOT": [ ">>react>>deescalate"
+        ],
+        "DEESCALATE": [ ">>msg>>deescalate",
+            "Welcome back!",
             "Can I help you with anything else?",
             ">>react>>menu"
         ]
     },
+    "text-matches": [
+      { "regex": "masked.?singer",
+        "type": "regex",
+        "IGNORECASE": true,
+        "responses": [
+          "The Masked Singer? I love that show! 👨‍🎤",
+          ">>react>>gif",
+          ">>do>>typing5",
+          "OK, it looks like you need to talk to an agent to upgrade your More™️ package to unlock this show.",
+          "Shall I connect you with an Agent?"
+        ]
+      },
+      { "regex": "schedule.*later|later.*schedule",
+        "type": "regex",
+        "IGNORECASE": true,
+        "responses": [
+          "No problem! When would you like to speak with an agent?",
+          ">>react>>timepicker"
+        ]
+      },
+      { "regex": "ready",
+        "type": "regex",
+        "IGNORECASE": true,
+        "responses": [
+          ">>do>>escalate",
+          "You're now connected! Catch you later!"
+        ]
+      }
+    ],
     "reusables": {
         "notImplemented": "Busted! We didn't implement this for this demo! 😅",
         "escalate": "Please stand by while I get one of Humans to help you ⏳",
         "deescalate": "I hope my Human was able to help you resolve your query",
-        "welcome": "Welcome! I'm your friendly chatbot!"
+        "welcome": "Hi!\nI’m Clarity, your automated helper designed to make any nebulous situation crystal clear. 😉"
     },
     "botPersona":{
-        "name": "The One bot",
+        "name": "Clarity",
         "avatar_url": "https://app.smooch.io/favicon.ico"
     }
 }
