@@ -5,8 +5,8 @@
             ">>msg>>welcome",
             ">>react>>listpicker"
         ],
-        "LISTPICKER": [
-            {   "text": "Sending Triage ListPicker to Apple User",
+        "LISTPICKER": [ ">>do>>typing",
+            {   "text": "Sent Triage ListPicker to Apple User",
                 "type": "text",
                 "role": "appMaker",
                 "override": {
@@ -17,7 +17,7 @@
                         "bid": "com.apple.messages.MSMessageExtensionBalloonPlugin:0000000000:com.apple.icloud.apps.messages.business.extension",
                         "data": {
                           "version": "1.0",
-                          "requestIdentifier": "",
+                          "requestIdentifier": "support-menu",
                           "listPicker": {
                             "sections": [
                               {
@@ -55,15 +55,15 @@
                           }
                         },
                         "receivedMessage": {
-                          "style": "small",
+                          "style": "large",
                           "title": "Help Picker",
-                          "subtitle": "What would you like to do?",
+                          "subtitle": "How can we help you today?",
                           "imageIdentifier": "1"
                         },
                         "replyMessage": {
                           "style": "small",
                           "title": "Selected option",
-                          "subtitle": ">Subtitle<"
+                          "subtitle": "Let's help you with this..."
                         }
                       }
                     }
@@ -74,25 +74,25 @@
         "GET-HELP": [ "What seems to be the issue?"
         ],
         "VIEW-SUBS-TV": [ ">>msg>>notImplemented",
-          "But if you had selected 'Support':",
+          "But if you had selected 'Something else':",
           ">>react>>GET-HELP"
         ],
         "UPDATE-PROGRAMMING": [ ">>msg>>notImplemented",
-          "But if you had selected 'Support':",
+          "But if you had selected 'Something else':",
           ">>react>>GET-HELP"
         ],
         "BILL-PAYMENT": [ ">>msg>>notImplemented",
-          "But if you had selected 'Support':",
+          "But if you had selected 'Something else':",
           ">>react>>GET-HELP"
         ],
         "FIND-STORE": [ ">>msg>>notImplemented",
-          "But if you had selected 'Support':",
+          "But if you had selected 'Something else':",
           ">>react>>GET-HELP"
         ],
-        "GIF": [ "Hold on and guess who’s behind this mask while I pull up your account. ![](https://media.giphy.com/media/JUAwDx1uGmZTdJ2dfL/giphy.gif)"
+        "GIF": [ ">>do>>typing", "Hold on and guess who’s behind this mask while I pull up your account. ![](https://media.smooch.io/apps/5dd2f091d098f60011d2d63f/Eqds0d_GukVCjtvULvzd4AdX/flamingo.gif)"
         ],
-        "TIMEPICKER": [
-          { "text": "Sending Support Appointment TimePicker to Apple User",
+        "TIMEPICKER": [ ">>do>>typing",
+          { "text": "Sent Support Appointment TimePicker to Apple User",
             "role": "appMaker",
             "override": {
                 "apple": {
@@ -106,23 +106,23 @@
                                         {
                                             "duration": 3600,
                                             "identifier": "7-am",
-                                            "startTime": "2018-10-24T07:00+0000"
+                                            "startTime": "2020-10-24T07:00+0000"
                                         },
                                         {
                                             "duration": 3600,
                                             "identifier": "8-am",
-                                            "startTime": "2018-10-24T08:00+0000"
+                                            "startTime": "2020-10-24T08:00+0000"
                                         }
                                     ],
                                     "timezoneOffset": 400,
                                     "title": "Available Reservations"
                                 },
                                 "mspVersion": "1.0",
-                                "requestIdentifier": "appointment-selector-1"
+                                "requestIdentifier": "appointment-selector"
                             },
                             "receivedMessage": {
                                 "style": "icon",
-                                "title": "Make a reservation"
+                                "title": "Book an agent"
                             },
                             "replyMessage": {
                                 "style": "icon",
@@ -136,9 +136,9 @@
           }
         ],
         "TIMEPICKER_RESP": [ "Excellent choice! I'll remind you when it’s time for your appointment.",
-          ">>do>>sleep2",
-          "![](https://gph.is/19pf4st)",
-          ">>do>>sleep5",
+          ">>do>>sleep3",
+          "...Some time later... ![](https://media.smooch.io/apps/5dd2f091d098f60011d2d63f/Tna3yLR4INsEOTYDigJjVRwz/world.gif)",
+          ">>do>>sleep3",
           "Hello again!\nIt's time for your appointment!",
           "Let me know when you're ready to be connected to an agent."
         ],
@@ -146,43 +146,45 @@
         ],
         "HUMAN": [ ">>react>>escalate"
         ],
-        "RESET": [ "Sure! Starting over! 😁",
-            ">>react>>start"
-        ],
-        "RESTART": [ ">>react>>reset"
-        ],
-        "ESCALATE": [ ">>msg>>escalate",
-            ">>do>>escalate"
+        "ESCALATE": [ ">>do>>escalate",
+          ">>msg>>escalate"  
         ],
         "BOT": [ ">>react>>deescalate"
         ],
-        "DEESCALATE": [ ">>msg>>deescalate",
-            "Welcome back!",
-            "Can I help you with anything else?",
-            ">>react>>menu"
+        "DEESCALATE": [ ">>do>>deescalate",
+          "Welcome back!",
+          ">>msg>>deescalate",
+          "Can I help you with anything else?",
+          ">>react>>menu"
+        ],
+        "RESTART": [ ">>react>>reset"
+        ],
+        "RESET": [ ">>do>>deescalate",
+          "Sure! Starting over! 😁",
+          ">>react>>start"
         ]
     },
-    "text-matches": [
-      { "regex": "masked.?singer",
+    "text-matches": {
+      "masked.?singer": {
         "type": "regex",
         "IGNORECASE": true,
-        "responses": [
-          "The Masked Singer? I love that show! 👨‍🎤",
+        "responses": [ "The Masked Singer? I love that show! 👨‍🎤",
           ">>react>>gif",
-          ">>do>>typing5",
+          ">>do>>typing",
+          ">>do>>sleep5",
           "OK, it looks like you need to talk to an agent to upgrade your More™️ package to unlock this show.",
           "Shall I connect you with an Agent?"
         ]
       },
-      { "regex": "schedule.*later|later.*schedule",
+      "schedule.*later|later.*schedule": {
         "type": "regex",
         "IGNORECASE": true,
         "responses": [
-          "No problem! When would you like to speak with an agent?",
+          "No problem! When would you prefer to speak with an agent?",
           ">>react>>timepicker"
         ]
       },
-      { "regex": "ready",
+      "ready": {
         "type": "regex",
         "IGNORECASE": true,
         "responses": [
@@ -190,15 +192,18 @@
           "You're now connected! Catch you later!"
         ]
       }
-    ],
+    },
     "reusables": {
         "notImplemented": "Busted! We didn't implement this for this demo! 😅",
-        "escalate": "Please stand by while I get one of Humans to help you ⏳",
+        "escalate": "Please stand by while I get one of my Humans to help you ⏳",
         "deescalate": "I hope my Human was able to help you resolve your query",
         "welcome": "Hi!\nI’m Clarity, your automated helper designed to make any nebulous situation crystal clear. 😉"
     },
     "botPersona":{
         "name": "Clarity",
         "avatar_url": "https://app.smooch.io/favicon.ico"
-    }
+    },
+    "deescalationKeywords": [
+      "BOT", "DEESCALATE", "RESET", "RESTART"
+    ]
 }

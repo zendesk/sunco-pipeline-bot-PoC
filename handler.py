@@ -4,12 +4,12 @@ from botocore.exceptions import ClientError
 from smooch.rest import ApiException
 from datetime import datetime, timedelta
 from time import sleep
-import smooch, json, os, requests#, jwt
+import smooch, json, os, requests, re#, jwt
+import inspect
 
 #TODO: pass context to Bus.Sys.
 
 # IMPROVEMENT: Upload attachments/html/css to app on signup?
-# planeBodyUrl = os.environ['planeBodyUrl']
 
 smooch_root = "https://api.smooch.io"
 notificationEndpoints = {
@@ -194,7 +194,7 @@ class mySmooch:
             sleep( duration )
 
     def sendMessage(self, messageObj):
-        #print(" >> sendMessage() got: %s" % messageObj)
+        print(" >> sendMessage() got: %s" % messageObj)
 
         if type(messageObj) is dict:
             pass
@@ -244,12 +244,11 @@ class mySmooch:
         return passthroughResult
 
     def deescalate(self):
+        #TODO: send message?
         #self.sendMessage({"text": "Please stand by while I get one of Humans to help you ⏳"})
         self.updateAppUser({ "escalated":False })
-        #self.sendResponses(">>msg>>escalate", nonce) # << gets caught in `start` fallback instead of trying to process the >>msg>> command
-
         #TODO: return something else if escalation flag update breaks?
-        print("Excecution complete (escalation unset) - returning: %s" % passthroughResult)
+        print("Excecution complete (escalation unset)")
         return True
 
     def passthroughEscalated(self, nonce):
@@ -262,66 +261,76 @@ class mySmooch:
             print("Excecution complete (message passed through) - returning: %s" % result)
             return result
 
-    def resetConvo(self, response, nonce=None):
+    def resetConvo(self, response=None, nonce=None):
         self.updateAppUser({ "escalated":False, "flow":False })
         #self.sendMessage(self.responses['reusables'][response])
-        self.sendResponses(None, response)  # TODO: needed?
+        if response is not None:
+            self.sendResponses(None, response)  # TODO: needed?
         #TODO: re-send welcome message ?
         result = { "statusCode": 200, "body": "escalation/flow flags cleared" }
         print("Escalation unset - returning: %s" % result)
         return result
 
+    def resetFlags(self):
+        self.updateAppUser({ "escalated":False, "flow":False })
+        result = { "statusCode": 200, "body": "escalation/flow flags cleared" }
+        print("Escalation unset by resetFlags(); returning: %s" % result)
+        return result
+
     #def sendResponses(self, flow, userText, nonce, data=None, msgType=None):
     def sendResponses(self, userText, nonce=None, data=None, msgType=None):
-        #print("Starting sendResponses(): '%s' & '%s'" % (flow, userText))
         print("Starting sendResponses(): '%s'" % (userText))
 
         results = []
-        #starting = False
-
-        if userText in self.responses['flows'].keys(): # Flow name in userText
-            input = userText
-        #     flow = userText
-        #     self.updateAppUser({ "flow":userText })
-        #     #starting = True
-        # elif flow in self.responses['flows'].keys(): # Flow found
-        #     pass
-        # else:   # Flow not found - use default
-        else:   # Response not found - use default
-            #print(" > WARNING: Unknown flow %s - using 'start' instead." % flow)
-            print(" > WARNING: Unknown input %s - using 'start' instead." % userText)
-            input = 'start'
-            # flow = 'start'
-            # starting = True
-
-        # if userText not in self.responses['flows'][flow].keys(): # Branch not found
-        #     userText = 'start'
-        #     if not starting:    # OK if this is the start of the Flow
-        #         print(" > WARNING: Unknown branch %s for flow %s - using 'start' instead." % (userText, flow))
+        hitType = None
 
         if msgType == 'formResponse':
-            # flow = 'FORM_RESPOSNE'
-            input = 'FORM_RESPOSNE'
+            hit = 'FORM_RESPOSNE'
+            hitType = 'responses'
+        elif userText in self.responses['responses'].keys():
+            # Response keyword in userText
+            hit = userText
+            hitType = 'responses'
+        else:
+            # No direct response - check for keywords
+            for pattern in self.responses['text-matches'].keys():
+                if self.responses['text-matches'][pattern]['type'] == "regex" \
+                    and re.search(pattern, userText, re.IGNORECASE):
+                    hit = pattern
+                    hitType = 'text-matches'
+                    break
 
-        #for msg in self.responses['flows'][flow][userText]:    # Iterate responses
-        #for msg in self.responses['flows'][flow]:    # Iterate responses
-        for msg in self.responses['flows'][input]:    # Iterate responses
+        if hitType is None:
+            # No keyword hit either - use default
+            print(" > WARNING: Unsupported input %s - using 'default' instead." % userText)
+            hit = 'default'
+            hitType = 'responses'
+
+        if hitType == 'responses':
+            resp_list = self.responses[hitType][hit]
+        elif hitType == 'text-matches':
+            resp_list = self.responses[hitType][hit]["responses"]
+
+        for msg in resp_list:    # Iterate responses
+            # Process '>>' commands
             cmdArr = msg.split('>>') if type(msg) is str else None
-            if cmdArr is not None and len(cmdArr) >= 3 and msg.startswith('>>'):   # Process '>>' commands
+            if cmdArr is not None and len(cmdArr) >= 3 and msg.startswith('>>'):
                 print("Processing command: %s" % msg)
                 if cmdArr[1] == 'do':           # special command
                     if cmdArr[2] == 'echo':     # echo user message
                         results.append(self.sendMessage("%s" % userText))
-                    elif cmdArr[2] == 'reset': # escalate to bus.sys.
+                    elif cmdArr[2] == 'reset': # reset escalation flags
                         results.append(self.resetConvo())
                     elif cmdArr[2] == 'escalate': # escalate to bus.sys.
                         #TODO: check nonce != None; can only handoff from pipeline bot mode
                         results.append(self.escalate(nonce))
-                    elif cmdArr[2] == 'deescalate': # escalate to bus.sys.
+                    elif cmdArr[2] == 'deescalate': # deescalate from bus.sys.
                         results.append(self.deescalate())
                     elif cmdArr[2].startswith('sleep'): # literally, sleep
                         sleep(int(cmdArr[2][5:]))
                         results.append("Slept %ss" % int(cmdArr[2][5:]))
+                    elif cmdArr[2].startswith('typing'): # send typing indicator
+                        results.append(self.sendTypingIndicator(0)) # 0=skip sleep in typing-indicator loop
                     else:   # backend behaviour
                         raise NotImplementedError("No handling for this 'do' action (yet) in '%s'" % '>>'.join(cmdArr))
                 elif cmdArr[1] == 'react': # simulate user input
@@ -396,6 +405,8 @@ class mySmooch:
             evtType = data['message']['type']
         elif evtTrigger == "postback":
             evtType = "postback"
+        elif evtTrigger == "passthrough:apple:interactive":
+            evtType = "applePassthrough"
         else:
             raise ValueError("Unsupported trigger: %s" % evtTrigger)
 
@@ -420,11 +431,11 @@ def lookupAppInDb(appId):
 
     return appCreds
 
-def pipelineAppUserEvent(event, context):
+def pipelineEvent(event, context):
     #global bodyData
     #print("New request: %s" % event)
     bodyData = json.loads(event['body'])
-    print("Starting pipelineAppUserEvent() with %s" % bodyData) # DEV
+    print("Starting %s with %s" % (inspect.stack()[0][3], bodyData)) # DEV
 
     #TODO: test required values in payload: {
     #   "": ['trigger', 'app', 'appUser', 'message', 'nonce'],
@@ -460,40 +471,87 @@ def pipelineAppUserEvent(event, context):
     # if 'flow' not in properties.keys():
     #     properties['flow'] = ""
 
-    # Catch master keywords
+    # Check/clear escalation state
     userText = smoochApi.getUserText(bodyData)
-    # if userText in ['RESET', 'RESTART']:
-    #     return smoochApi.resetConvo(">>react>>start", nonce)
-    # elif userText in [ 'DEESCALATE', 'BOT' ]:
-    #     return smoochApi.resetConvo("deescalate")
-    # elif 'escalated' in properties.keys() and properties['escalated']:
     if 'escalated' in properties.keys() and properties['escalated']:
         if lastSeen < ( datetime.utcnow() - timedelta(hours=1) ):    # >1h inactive, reset escalation state
-            return smoochApi.resetConvo(">>msg>>welcome")
-        else:
+            print(smoochApi.resetFlags())
+        elif userText in smoochApi.responses['deescalationKeywords']:
+            # Process master keywords
+            return smoochApi.sendResponses(userText, nonce, msgType=eventType)
+        else:   # Continue escalation
             return smoochApi.passthroughEscalated(nonce)
-    # elif userText in [ 'ESCALATE', 'HUMAN', 'HELP']:
-    #     return smoochApi.escalate(nonce) 
-    # # elif 'flow' not in properties.keys() or not properties['flow']:
-    # #     # Unspecified flow - send default
-    # #     return smoochApi.sendResponses('start', userText)
-    else:
-        #print("(372) hoping for a known flow: %s" % bodyData)
-        #return smoochApi.sendResponses(properties['flow'], userText, nonce, msgType=messageType)
-        return smoochApi.sendResponses(userText, nonce, msgType=eventType)
+
+    return smoochApi.sendResponses(userText, nonce, msgType=eventType)
 
     # body = {
     #     "message": "Go Serverless v1.0! Your function executed successfully!",
     #     "input": event
     # }
-
     # response = {
     #     "statusCode": 200,
     #     "body": json.dumps(body)
     # }
 
-def handleWebhook():
-    pass
+# def handleWebhook():
+#     pass
+
+def applePassthroughEvent(event, context):
+    bodyData = json.loads(event['body'])
+    print("Starting %s with %s" % (inspect.stack()[0][3], bodyData)) # DEV
+
+    #TODO: test required values in payload: {
+    #   "": ['trigger', 'app', 'appUser', 'message', 'nonce'],
+    #   "app": ['_id'],
+    #   "appUser": ['_id'],
+    #   "message": ['text'] 
+    #if not test_contents(bodyData, structures['message:appUser']):
+
+    appId = bodyData['app']['_id']
+    appUserId = bodyData['appUser']['_id']
+
+    # get parse event info
+    eventType, eventOrigin = mySmooch.getEventTypeOrigin(bodyData)
+
+    # Lookup supported app in table
+    appCreds = lookupAppInDb(appId)
+
+    # Verify webhook signature
+    if 'X-API-Key' not in event['headers'].keys() or event['headers']['X-API-Key'] != appCreds['webhookSecret']:
+        print(" %s == %s" % (event['headers']['X-API-Key'], appCreds['webhookSecret']))
+        print("Types: %s, %s" % (type(event['headers']['X-API-Key']), type(appCreds['webhookSecret'])))
+        result = { "statusCode": 400, "body": " > Bad Request"}
+        print(" >> Request:\n%s\n >> Result: %s" % (bodyData, result))
+        return result
+
+    if eventType != "applePassthrough":
+        result = { "statusCode": 400, "body": " > Bad Request: %s" % eventType}
+        print(" >> Request:\n%s\n >> Result: %s" % (bodyData, result))
+        return result
+
+    # Configure API key authorization (alternative): jwt
+    smoochApi = mySmooch(appId, appCreds['JWT'], appUserId)
+
+    payload_apple = bodyData['payload']['apple']
+    if 'interactiveDataRef' in payload_apple.keys():
+        #getRefPayload(payload_apple['interactiveDataRef'], payload_apple['id'])
+        raise NotImplementedError()
+    elif 'interactiveData' in payload_apple.keys():
+        requestIdent = payload_apple['interactiveData']['data']['requestIdentifier']
+        if requestIdent == "support-menu":
+            selectedOption = payload_apple['interactiveData']['data']['listPicker']['sections'][0]['items'][0]['identifier']
+            print("543: %s" % selectedOption)
+            return smoochApi.sendResponses(selectedOption.upper())
+        elif requestIdent == "appointment-selector":
+            selectedEvent = payload_apple['interactiveData']['data']['event']
+            print("547: %s" % selectedEvent)
+            return smoochApi.sendResponses("timepicker_resp".upper())
+        else:
+            raise NotImplementedError()
+    else:
+        result = { "statusCode": 400, "body": " > Bad Request: 539"}
+        print(" >> Request:\n%s\n >> Result: %s" % (bodyData, result))
+        return result
 
 def linter_smoketest():
     purposely_unused_variable = None

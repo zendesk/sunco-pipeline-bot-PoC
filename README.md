@@ -8,7 +8,13 @@
 1. for `minimial_widget.html`:
     * replace `<<smooch appId Here>>` with your smooch appId (it should still be within single-`'` or double-quotes`"`
     * for best results, serve the `minimal_widget.html` page via a server (e.g.: `python -m SimpleHTTPServer 80`)
-  
+1. Keep track of execution times:
+    * Lambda has a default timeout of 6 sec (configurable up to 5 mins)
+    * API Gateway has a hard-timeout at 29 sec (!?)
+    * lots of replies to a given trigger take longer to process (**including** nested responses due to `>>react>>X`)
+    * images/media also take longer (consider pre-uploading files to media.smooch.io for best results)
+    * `>>do>>sleepX` also adds `X` seconds of execution time
+
 # Examples
 ## DynamoDB 'approved Apps' table entry
     {
