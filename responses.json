@@ -142,6 +142,54 @@
           "Hello again!\nIt's time for your appointment!",
           "Let me know when you're ready to be connected to an agent."
         ],
+        "OAUTH_COMPLETE": [ "Awesome! Thanks!",
+          ">>react>>gif",
+          ">>do>>typing",
+          ">>do>>sleep5",
+          "OK, it looks like you need to talk to an agent to upgrade your More™️ package to unlock this show.",
+          "Shall I connect you with an Agent?"
+        ],
+        "IMESSAGE_APP":[
+          { "text": "Sending our custom (sample) iMessage app to Apple user",
+            "role": "appMaker",
+            "type": "text",
+            "override": {
+              "apple": {
+                "payload": {
+                  "attachments": [
+                    {
+                      "decryption-key": "00260450bb05cd4597a8ae706199f685c0f6fafee4b6c3e1375771c472f4149e29",
+                      "file-size": "10159",
+                      "mime-type": "image/png",
+                      "mmcs-owner": "M39303332653438322d396338342d313165372d613330332d633735336231626666366661.C01USN00",
+                      "mmcs-signature-base64": "AXG58GIo7xWZz7gRXZH2liWuzVah",
+                      "mmcs-url": "https://p97-content.icloud.com",
+                      "name": "icon.png"
+                    }
+                  ],
+                  "interactiveData": {
+                    "URL": "?options=tacos,burritos",
+                    "appId": 34554,
+                    "appName": "Your App Name",
+                    "bid": "com.apple.messages.MSMessageExtensionBalloonPlugin:3PQS6L553X:io.smooch.iMessageSample.MessagesExtension",
+                    "receivedMessage": {
+                      "imageSubtitle": "Image Subtitle",
+                      "imageTitle": "Image Title",
+                      "secondarySubtitle": "Trailing Caption",
+                      "subtitle": "iMessage app",
+                      "tertiarySubtitle": "Trailing Subcaption",
+                      "title": "This is an example"
+                    },
+                    "useLiveLayout": false
+                  },
+                  "type": "interactive"
+                }
+              }
+            }
+          }
+        ],
+        "NEAT IMESSAGE EXTENSION": [ "I'm glad you enjoyed it! 😁"
+        ],
         "AGENT": [ ">>react>>escalate"
         ],
         "HUMAN": [ ">>react>>escalate"
@@ -165,27 +213,20 @@
         ]
     },
     "text-matches": {
-      "masked.?singer": {
-        "type": "regex",
+      "masked.?singer": { "type": "regex",
         "IGNORECASE": true,
         "responses": [ "The Masked Singer? I love that show! 👨‍🎤",
-          ">>react>>gif",
-          ">>do>>typing",
-          ">>do>>sleep5",
-          "OK, it looks like you need to talk to an agent to upgrade your More™️ package to unlock this show.",
-          "Shall I connect you with an Agent?"
+          "I’m going to need you to login to verify your identity:"
         ]
       },
-      "schedule.*later|later.*schedule": {
-        "type": "regex",
+      "schedule.*later|later.*schedule": { "type": "regex",
         "IGNORECASE": true,
         "responses": [
           "No problem! When would you prefer to speak with an agent?",
           ">>react>>timepicker"
         ]
       },
-      "ready": {
-        "type": "regex",
+      "ready": { "type": "regex",
         "IGNORECASE": true,
         "responses": [
           ">>do>>escalate",
