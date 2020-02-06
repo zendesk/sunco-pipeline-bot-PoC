@@ -3,7 +3,7 @@
 1. Install Python3.7 (+pip3)
 1. Install Serverless Framework
     1. Be able to deploy a sample project to AWS using serverless: https://serverless.com/framework/docs/providers/aws/examples/hello-world/
-    1. Install additional python-requirements package: `npm install serverless-python-requirements`
+    1. Install additional python-requirements package: `npm install -g serverless-python-requirements`
 1. Deploy the project to aws and note your service's POST endpoint
 1. Setup your Smooch app: (most steps are commented out as part of `linkBot2App()`)
     1. Create your pipeline processor object (webhook)
