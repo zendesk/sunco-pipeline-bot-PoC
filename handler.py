@@ -287,7 +287,7 @@ class mySmooch:
         #         print(" > WARNING: Unknown branch %s for flow %s - using 'start' instead." % (userText, flow))
 
         if msgType == 'formResponse':
-            flow = 'FORM_RESPOSNE'
+            flow = 'FORM_RESPONSE'
 
         #for msg in self.responses['flows'][flow][userText]:    # Iterate responses
         for msg in self.responses['flows'][flow]:    # Iterate responses
