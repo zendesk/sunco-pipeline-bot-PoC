@@ -210,8 +210,9 @@ class mySmooch:
             "type": "text",
             "role": "appMaker"
         }
-        messageToSend.update(self.responses['botPersona'])
-        #print(" > DEV: Updated base msg: %s" % messageToSend)
+        if 'role' in messageObj.keys() and messageObj['role'] == 'appMaker':
+            messageToSend.update(self.responses['botPersona'])
+            #print(" > DEV: Updated base msg: %s" % messageToSend)
         
         # TODO: check for key collisions?
         # x.update(y) will overwrite x with conflicting values from y
