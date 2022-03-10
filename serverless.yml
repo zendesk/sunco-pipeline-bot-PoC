@@ -11,8 +11,7 @@
 #
 # Happy Coding!
 
-service:
-  name: ABC-bot-selfserve-escalation
+service: web-bot-selfserve-escalation
 #app: your-app-name
 #tenant: your-tenant-name
 
@@ -65,7 +64,7 @@ plugins:
   - serverless-python-requirements
 
 custom:
-  dynamoDbAppIdTableName: "${self:service.name}-${self:provider.stage}-integratedApps"
+  dynamoDbAppIdTableName: "${self:service}-${self:provider.stage}-integratedApps"
   botEndpoint: "pipelineEvent"
   appleEndpoint: "applePassthroughEvent"
 
@@ -112,18 +111,6 @@ functions:
       appTableName: ${self:custom.dynamoDbAppIdTableName}
       botStage: ${self:provider.stage}
       botEndpoint: ${self:custom.botEndpoint}
-
-  applePassthrough:
-    handler: handler.${self:custom.appleEndpoint}
-    timeout: 20
-    events:
-      - http:
-          path: ${self:custom.appleEndpoint}
-          method: post
-    environment:
-      appTableName: ${self:custom.dynamoDbAppIdTableName}
-      botStage: ${self:provider.stage}
-      botEndpoint: ${self:custom.appleEndpoint}
 
 # you can add CloudFormation resource templates here
 resources:
