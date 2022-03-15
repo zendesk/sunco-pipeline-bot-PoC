@@ -82,30 +82,30 @@ functions:
   pipeline:
     handler: handler.${self:custom.botEndpoint}
     timeout: 20
-#    The following are a few example events you can configure
-#    NOTE: Please make sure to change your handler code to work with those events
-#    Check the event documentation for details
+    #    The following are a few example events you can configure
+    #    NOTE: Please make sure to change your handler code to work with those events
+    #    Check the event documentation for details
     events:
       - http:
           path: ${self:custom.botEndpoint}
           method: post
-#      - websocket: $connect
-#      - s3: ${env:BUCKET}
-#      - schedule: rate(10 minutes)
-#      - sns: greeter-topic
-#      - stream: arn:aws:dynamodb:region:XXXXXX:table/foo/stream/1970-01-01T00:00:00.000
-#      - cloudwatchEvent:
-#          event:
-#            source:
-#              - "aws.ec2"
-#            detail-type:
-#              - "EC2 Instance State-change Notification"
-#            detail:
-#              state:
-#                - pending
-#      - cloudwatchLog: '/aws/lambda/hello'
+    #      - websocket: $connect
+    #      - s3: ${env:BUCKET}
+    #      - schedule: rate(10 minutes)
+    #      - sns: greeter-topic
+    #      - stream: arn:aws:dynamodb:region:XXXXXX:table/foo/stream/1970-01-01T00:00:00.000
+    #      - cloudwatchEvent:
+    #          event:
+    #            source:
+    #              - "aws.ec2"
+    #            detail-type:
+    #              - "EC2 Instance State-change Notification"
+    #            detail:
+    #              state:
+    #                - pending
+    #      - cloudwatchLog: '/aws/lambda/hello'
 
-#    Define function environment variables here
+    #    Define function environment variables here
     environment:
       appTableName: ${self:custom.dynamoDbAppIdTableName}
       botStage: ${self:provider.stage}

@@ -1,250 +1,246 @@
 {
-    "demoDescription": "Triage Bot with Human handoff",
-    "responses":{
-        "default": [
-            ">>msg>>welcome",
-            ">>react>>listpicker"
-        ],
-        "LISTPICKER": [ ">>do>>typing",
-            {   "text": "Sent Triage ListPicker to Apple User",
-                "type": "text",
-                "role": "appMaker",
-                "override": {
-                  "apple": {
-                    "payload": {
-                      "type": "interactive",
-                      "interactiveData": {
-                        "bid": "com.apple.messages.MSMessageExtensionBalloonPlugin:0000000000:com.apple.icloud.apps.messages.business.extension",
-                        "data": {
-                          "version": "1.0",
-                          "requestIdentifier": "support-menu",
-                          "listPicker": {
-                            "sections": [
-                              {
-                                "title": "Support Menu",
-                                "order": 0,
-                                "items": [
-                                  {
-                                    "title": "View my TV subscription",
-                                    "order": 0,
-                                    "identifier": "view-subscriptions-tv"
-                                  },
-                                  {
-                                    "title": "Change my programming",
-                                    "order": 1,
-                                    "identifier": "update-programming"
-                                  },
-                                  {
-                                    "title": "Pay my bill",
-                                    "order": 2,
-                                    "identifier": "bill-payment"
-                                  },
-                                  {
-                                    "title": "Find a store",
-                                    "order": 3,
-                                    "identifier": "find-store"
-                                  },
-                                  {
-                                    "title": "Something else",
-                                    "order": 4,
-                                    "identifier": "get-help"
-                                  }
-                                ]
-                              }
-                            ]
+  "responses": {
+    "default": [">>msg>>welcome", ">>react>>listpicker"],
+    "LISTPICKER": [
+      ">>do>>typing",
+      {
+        "text": "Sent Triage ListPicker to Apple User",
+        "type": "text",
+        "role": "appMaker",
+        "override": {
+          "apple": {
+            "payload": {
+              "type": "interactive",
+              "interactiveData": {
+                "bid": "com.apple.messages.MSMessageExtensionBalloonPlugin:0000000000:com.apple.icloud.apps.messages.business.extension",
+                "data": {
+                  "version": "1.0",
+                  "requestIdentifier": "support-menu",
+                  "listPicker": {
+                    "sections": [
+                      {
+                        "title": "Support Menu",
+                        "order": 0,
+                        "items": [
+                          {
+                            "title": "View my TV subscription",
+                            "order": 0,
+                            "identifier": "view-subscriptions-tv"
+                          },
+                          {
+                            "title": "Change my programming",
+                            "order": 1,
+                            "identifier": "update-programming"
+                          },
+                          {
+                            "title": "Pay my bill",
+                            "order": 2,
+                            "identifier": "bill-payment"
+                          },
+                          {
+                            "title": "Find a store",
+                            "order": 3,
+                            "identifier": "find-store"
+                          },
+                          {
+                            "title": "Something else",
+                            "order": 4,
+                            "identifier": "get-help"
                           }
-                        },
-                        "receivedMessage": {
-                          "style": "large",
-                          "title": "Help Picker",
-                          "subtitle": "How can we help you today?",
-                          "imageIdentifier": "1"
-                        },
-                        "replyMessage": {
-                          "style": "small",
-                          "title": "Selected option",
-                          "subtitle": "Let's help you with this..."
-                        }
+                        ]
                       }
-                    }
+                    ]
                   }
-                }
-            }
-        ],
-        "GET-HELP": [ "What seems to be the issue?"
-        ],
-        "VIEW-SUBS-TV": [ ">>msg>>notImplemented",
-          "But if you had selected 'Something else':",
-          ">>react>>GET-HELP"
-        ],
-        "UPDATE-PROGRAMMING": [ ">>msg>>notImplemented",
-          "But if you had selected 'Something else':",
-          ">>react>>GET-HELP"
-        ],
-        "BILL-PAYMENT": [ ">>msg>>notImplemented",
-          "But if you had selected 'Something else':",
-          ">>react>>GET-HELP"
-        ],
-        "FIND-STORE": [ ">>msg>>notImplemented",
-          "But if you had selected 'Something else':",
-          ">>react>>GET-HELP"
-        ],
-        "GIF": [ ">>do>>typing", "Hold on and guess who’s behind this mask while I pull up your account. ![](https://media.smooch.io/apps/5dd2f091d098f60011d2d63f/Eqds0d_GukVCjtvULvzd4AdX/flamingo.gif)"
-        ],
-        "TIMEPICKER": [ ">>do>>typing",
-          { "text": "Sent Support Appointment TimePicker to Apple User",
-            "role": "appMaker",
-            "override": {
-                "apple": {
-                    "payload": {
-                        "interactiveData": {
-                            "bid": "com.apple.messages.MSMessageExtensionBalloonPlugin:0000000000:com.apple.icloud.apps.messages.business.extension",
-                            "data": {
-                                "event": {
-                                    "identifier": "reservation-id",
-                                    "timeslots": [
-                                        {
-                                            "duration": 3600,
-                                            "identifier": "7-am",
-                                            "startTime": "2020-10-24T07:00+0000"
-                                        },
-                                        {
-                                            "duration": 3600,
-                                            "identifier": "8-am",
-                                            "startTime": "2020-10-24T08:00+0000"
-                                        }
-                                    ],
-                                    "timezoneOffset": 400,
-                                    "title": "Available Reservations"
-                                },
-                                "mspVersion": "1.0",
-                                "requestIdentifier": "appointment-selector"
-                            },
-                            "receivedMessage": {
-                                "style": "icon",
-                                "title": "Book an agent"
-                            },
-                            "replyMessage": {
-                                "style": "icon",
-                                "title": "Your reservation"
-                            }
-                        },
-                        "type": "interactive"
-                    }
-                }
-            }
-          }
-        ],
-        "TIMEPICKER_RESP": [ "Excellent choice! I'll remind you when it’s time for your appointment.",
-          ">>do>>sleep3",
-          "...Some time later... ![](https://media.smooch.io/apps/5dd2f091d098f60011d2d63f/Tna3yLR4INsEOTYDigJjVRwz/world.gif)",
-          ">>do>>sleep3",
-          "Hello again!\nIt's time for your appointment!",
-          "Let me know when you're ready to be connected to an agent."
-        ],
-        "OAUTH_COMPLETE": [ "Awesome! Thanks!",
-          ">>react>>gif",
-          ">>do>>typing",
-          ">>do>>sleep5",
-          "OK, it looks like you need to talk to an agent to upgrade your More™️ package to unlock this show.",
-          "Shall I connect you with an Agent?"
-        ],
-        "IMESSAGE_APP":[
-          { "text": "Sending our custom (sample) iMessage app to Apple user",
-            "role": "appMaker",
-            "type": "text",
-            "override": {
-              "apple": {
-                "payload": {
-                  "attachments": [
-                    {
-                      "decryption-key": "00260450bb05cd4597a8ae706199f685c0f6fafee4b6c3e1375771c472f4149e29",
-                      "file-size": "10159",
-                      "mime-type": "image/png",
-                      "mmcs-owner": "M39303332653438322d396338342d313165372d613330332d633735336231626666366661.C01USN00",
-                      "mmcs-signature-base64": "AXG58GIo7xWZz7gRXZH2liWuzVah",
-                      "mmcs-url": "https://p97-content.icloud.com",
-                      "name": "icon.png"
-                    }
-                  ],
-                  "interactiveData": {
-                    "URL": "?options=tacos,burritos",
-                    "appId": 34554,
-                    "appName": "Your App Name",
-                    "bid": "com.apple.messages.MSMessageExtensionBalloonPlugin:3PQS6L553X:io.smooch.iMessageSample.MessagesExtension",
-                    "receivedMessage": {
-                      "imageSubtitle": "Image Subtitle",
-                      "imageTitle": "Image Title",
-                      "secondarySubtitle": "Trailing Caption",
-                      "subtitle": "iMessage app",
-                      "tertiarySubtitle": "Trailing Subcaption",
-                      "title": "This is an example"
-                    },
-                    "useLiveLayout": false
-                  },
-                  "type": "interactive"
+                },
+                "receivedMessage": {
+                  "style": "large",
+                  "title": "Help Picker",
+                  "subtitle": "How can we help you today?",
+                  "imageIdentifier": "1"
+                },
+                "replyMessage": {
+                  "style": "small",
+                  "title": "Selected option",
+                  "subtitle": "Let's help you with this..."
                 }
               }
             }
           }
-        ],
-        "NEAT IMESSAGE EXTENSION": [ "I'm glad you enjoyed it! 😁"
-        ],
-        "AGENT": [ ">>react>>escalate"
-        ],
-        "HUMAN": [ ">>react>>escalate"
-        ],
-        "ESCALATE": [ ">>do>>escalate",
-          ">>msg>>escalate"  
-        ],
-        "BOT": [ ">>react>>deescalate"
-        ],
-        "DEESCALATE": [ ">>do>>deescalate",
-          "Welcome back!",
-          ">>msg>>deescalate",
-          "Can I help you with anything else?",
-          ">>react>>menu"
-        ],
-        "RESTART": [ ">>react>>reset"
-        ],
-        "RESET": [ ">>do>>deescalate",
-          "Sure! Starting over! 😁",
-          ">>react>>start"
-        ]
-    },
-    "text-matches": {
-      "masked.?singer": { "type": "regex",
-        "IGNORECASE": true,
-        "responses": [ "The Masked Singer? I love that show! 👨‍🎤",
-          "I’m going to need you to login to verify your identity:"
-        ]
-      },
-      "schedule.*later|later.*schedule": { "type": "regex",
-        "IGNORECASE": true,
-        "responses": [
-          "No problem! When would you prefer to speak with an agent?",
-          ">>react>>timepicker"
-        ]
-      },
-      "ready": { "type": "regex",
-        "IGNORECASE": true,
-        "responses": [
-          ">>do>>escalate",
-          "You're now connected! Catch you later!"
-        ]
+        }
       }
+    ],
+    "GET-HELP": ["What seems to be the issue?"],
+    "VIEW-SUBS-TV": [
+      ">>msg>>notImplemented",
+      "But if you had selected 'Something else':",
+      ">>react>>GET-HELP"
+    ],
+    "UPDATE-PROGRAMMING": [
+      ">>msg>>notImplemented",
+      "But if you had selected 'Something else':",
+      ">>react>>GET-HELP"
+    ],
+    "BILL-PAYMENT": [
+      ">>msg>>notImplemented",
+      "But if you had selected 'Something else':",
+      ">>react>>GET-HELP"
+    ],
+    "FIND-STORE": [
+      ">>msg>>notImplemented",
+      "But if you had selected 'Something else':",
+      ">>react>>GET-HELP"
+    ],
+    "GIF": [
+      ">>do>>typing",
+      "Hold on and guess who’s behind this mask while I pull up your account. ![](https://media.smooch.io/apps/5dd2f091d098f60011d2d63f/Eqds0d_GukVCjtvULvzd4AdX/flamingo.gif)"
+    ],
+    "TIMEPICKER": [
+      ">>do>>typing",
+      {
+        "text": "Sent Support Appointment TimePicker to Apple User",
+        "role": "appMaker",
+        "override": {
+          "apple": {
+            "payload": {
+              "interactiveData": {
+                "bid": "com.apple.messages.MSMessageExtensionBalloonPlugin:0000000000:com.apple.icloud.apps.messages.business.extension",
+                "data": {
+                  "event": {
+                    "identifier": "reservation-id",
+                    "timeslots": [
+                      {
+                        "duration": 3600,
+                        "identifier": "7-am",
+                        "startTime": "2020-10-24T07:00+0000"
+                      },
+                      {
+                        "duration": 3600,
+                        "identifier": "8-am",
+                        "startTime": "2020-10-24T08:00+0000"
+                      }
+                    ],
+                    "timezoneOffset": 400,
+                    "title": "Available Reservations"
+                  },
+                  "mspVersion": "1.0",
+                  "requestIdentifier": "appointment-selector"
+                },
+                "receivedMessage": {
+                  "style": "icon",
+                  "title": "Book an agent"
+                },
+                "replyMessage": {
+                  "style": "icon",
+                  "title": "Your reservation"
+                }
+              },
+              "type": "interactive"
+            }
+          }
+        }
+      }
+    ],
+    "TIMEPICKER_RESP": [
+      "Excellent choice! I'll remind you when it’s time for your appointment.",
+      ">>do>>sleep3",
+      "...Some time later... ![](https://media.smooch.io/apps/5dd2f091d098f60011d2d63f/Tna3yLR4INsEOTYDigJjVRwz/world.gif)",
+      ">>do>>sleep3",
+      "Hello again!\nIt's time for your appointment!",
+      "Let me know when you're ready to be connected to an agent."
+    ],
+    "OAUTH_COMPLETE": [
+      "Awesome! Thanks!",
+      ">>react>>gif",
+      ">>do>>typing",
+      ">>do>>sleep5",
+      "OK, it looks like you need to talk to an agent to upgrade your More™️ package to unlock this show.",
+      "Shall I connect you with an Agent?"
+    ],
+    "IMESSAGE_APP": [
+      {
+        "text": "Sending our custom (sample) iMessage app to Apple user",
+        "role": "appMaker",
+        "type": "text",
+        "override": {
+          "apple": {
+            "payload": {
+              "attachments": [
+                {
+                  "decryption-key": "00260450bb05cd4597a8ae706199f685c0f6fafee4b6c3e1375771c472f4149e29",
+                  "file-size": "10159",
+                  "mime-type": "image/png",
+                  "mmcs-owner": "M39303332653438322d396338342d313165372d613330332d633735336231626666366661.C01USN00",
+                  "mmcs-signature-base64": "AXG58GIo7xWZz7gRXZH2liWuzVah",
+                  "mmcs-url": "https://p97-content.icloud.com",
+                  "name": "icon.png"
+                }
+              ],
+              "interactiveData": {
+                "URL": "?options=tacos,burritos",
+                "appId": 34554,
+                "appName": "Your App Name",
+                "bid": "com.apple.messages.MSMessageExtensionBalloonPlugin:3PQS6L553X:io.smooch.iMessageSample.MessagesExtension",
+                "receivedMessage": {
+                  "imageSubtitle": "Image Subtitle",
+                  "imageTitle": "Image Title",
+                  "secondarySubtitle": "Trailing Caption",
+                  "subtitle": "iMessage app",
+                  "tertiarySubtitle": "Trailing Subcaption",
+                  "title": "This is an example"
+                },
+                "useLiveLayout": false
+              },
+              "type": "interactive"
+            }
+          }
+        }
+      }
+    ],
+    "NEAT IMESSAGE EXTENSION": ["I'm glad you enjoyed it! 😁"],
+    "AGENT": [">>react>>escalate"],
+    "HUMAN": [">>react>>escalate"],
+    "ESCALATE": [">>do>>escalate", ">>msg>>escalate"],
+    "BOT": [">>react>>deescalate"],
+    "DEESCALATE": [
+      ">>do>>deescalate",
+      "Welcome back!",
+      ">>msg>>deescalate",
+      "Can I help you with anything else?",
+      ">>react>>menu"
+    ],
+    "RESTART": [">>react>>reset"],
+    "RESET": [">>do>>deescalate", "Sure! Starting over! 😁", ">>react>>start"]
+  },
+    "masked.?singer": {
+      "type": "regex",
+      "IGNORECASE": true,
+      "responses": [
+        "The Masked Singer? I love that show! 👨‍🎤",
+        "I’m going to need you to login to verify your identity:"
+      ]
     },
-    "reusables": {
-        "notImplemented": "Busted! We didn't implement this for this demo! 😅",
-        "escalate": "Please stand by while I get one of my Humans to help you ⏳",
-        "deescalate": "I hope my Human was able to help you resolve your query",
+    "schedule.*later|later.*schedule": {
+      "type": "regex",
+      "IGNORECASE": true,
+      "responses": [
+        "No problem! When would you prefer to speak with an agent?",
+        ">>react>>timepicker"
+      ]
+    },
+    "ready": {
+      "type": "regex",
+      "IGNORECASE": true,
+      "responses": [">>do>>escalate", "You're now connected! Catch you later!"]
+    }
+  },
+  "reusables": {
+    "notImplemented": "Busted! We didn't implement this for this demo! 😅",
+    "escalate": "Please stand by while I get one of my Humans to help you ⏳",
+    "deescalate": "I hope my Human was able to help you resolve your query",
         "welcome": "Hi!\nI’m Clarity, your automated helper designed to make any nebulous situation crystal clear. 😉"
     },
-    "botPersona":{
-        "name": "Clarity",
-        "avatar_url": "https://app.smooch.io/favicon.ico"
-    },
-    "deescalationKeywords": [
-      "BOT", "DEESCALATE", "RESET", "RESTART"
-    ]
+  "botPersona": {
+    "avatar_url": "https://app.smooch.io/favicon.ico"
+  },
+  "deescalationKeywords": ["BOT", "DEESCALATE", "RESET", "RESTART"]
 }
