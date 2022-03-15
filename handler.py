@@ -561,62 +561,6 @@ def pipelineEvent(event, context):
 # def handleWebhook():
 #     pass
 
-def applePassthroughEvent(event, context):
-    bodyData = json.loads(event['body'])
-    print("Starting %s with %s" % (inspect.stack()[0][3], bodyData)) # DEV
-
-    #TODO: test required values in payload: {
-    #   "": ['trigger', 'app', 'appUser', 'message', 'nonce'],
-    #   "app": ['_id'],
-    #   "appUser": ['_id'],
-    #   "message": ['text'] 
-    #if not test_contents(bodyData, structures['message:appUser']):
-
-    appId = bodyData['app']['_id']
-    appUserId = bodyData['appUser']['_id']
-
-    # get parse event info
-    eventType, eventOrigin = mySmooch.getEventTypeOrigin(bodyData)
-
-    # Lookup supported app in table
-    appCreds = lookupAppInDb(appId)
-
-    # Verify webhook signature
-    if 'X-API-Key' not in event['headers'].keys() or event['headers']['X-API-Key'] != appCreds['webhookSecret']:
-        print(" %s == %s" % (event['headers']['X-API-Key'], appCreds['webhookSecret']))
-        print("Types: %s, %s" % (type(event['headers']['X-API-Key']), type(appCreds['webhookSecret'])))
-        result = { "statusCode": 400, "body": " > Bad Request"}
-        print(" >> Request:\n%s\n >> Result: %s" % (bodyData, result))
-        return result
-
-    if eventType != "applePassthrough":
-        result = { "statusCode": 400, "body": " > Bad Request: %s" % eventType}
-        print(" >> Request:\n%s\n >> Result: %s" % (bodyData, result))
-        return result
-
-    # Configure API key authorization (alternative): jwt
-    smoochApi = mySmooch(appId, appCreds['JWT'], appUserId)
-
-    payload_apple = bodyData['payload']['apple']
-    if 'interactiveDataRef' in payload_apple.keys():
-        #getRefPayload(payload_apple['interactiveDataRef'], payload_apple['id'])
-        raise NotImplementedError()
-    elif 'interactiveData' in payload_apple.keys():
-        requestIdent = payload_apple['interactiveData']['data']['requestIdentifier']
-        if requestIdent == "support-menu":
-            selectedOption = payload_apple['interactiveData']['data']['listPicker']['sections'][0]['items'][0]['identifier']
-            print("543: %s" % selectedOption)
-            return smoochApi.sendResponses(selectedOption.upper())
-        elif requestIdent == "appointment-selector":
-            selectedEvent = payload_apple['interactiveData']['data']['event']
-            print("547: %s" % selectedEvent)
-            return smoochApi.sendResponses("timepicker_resp".upper())
-        else:
-            raise NotImplementedError()
-    else:
-        result = { "statusCode": 400, "body": " > Bad Request: 539"}
-        print(" >> Request:\n%s\n >> Result: %s" % (bodyData, result))
-        return result
 
 def linter_smoketest():
     purposely_unused_variable = None
