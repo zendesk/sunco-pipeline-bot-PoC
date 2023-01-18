@@ -1,18 +1,4 @@
-# Welcome to Serverless!
-#
-# This file is the main config file for your service.
-# It's very minimal at this point and uses default values.
-# You can always add more config options for more control.
-# We've included some commented out config examples here.
-# Just uncomment any of them to get that config option.
-#
-# For full config options, check the docs:
-#    docs.serverless.com
-#
-# Happy Coding!
-
-service:
-  name: ABC-bot-selfserve-escalation
+service: AMB-pipeline-bot-PoC
 #app: your-app-name
 #tenant: your-tenant-name
 
@@ -22,26 +8,26 @@ service:
 
 provider:
   name: aws
-  runtime: python3.7
+  runtime: python3.9
   stage: dev
+  region: us-west-2
+  profile: saml
 
-# you can overwrite defaults here
-#  region: us-east-1
-
-  iamRoleStatements:
-    - Effect: "Allow"
-      Action:
-        - dynamodb:GetItem
-      #Resource: "arn:aws:dynamodb:us-east-1:040420900284:table/integratedApps"
-      # Resource: "arn:aws:dynamodb:us-east-1:040420900284:table/${self:custom.dynamoDbAppIdTableName}"
-      Resource:
-        - 'Fn::Join':
-          - ":"
-          -
-            - "arn:aws:dynamodb"
-            - Ref: AWS::Region
-            - Ref: AWS::AccountId
-            - "table/${self:custom.dynamoDbAppIdTableName}"
+  iam:
+    role:
+      statements:
+        - Effect: "Allow"
+          Action:
+            - dynamodb:GetItem
+          #Resource: "arn:aws:dynamodb:us-east-1:040420900284:table/integratedApps"
+          # Resource: "arn:aws:dynamodb:us-east-1:040420900284:table/${self:custom.dynamoDbAppIdTableName}"
+          Resource:
+            - "Fn::Join":
+                - ":"
+                - - "arn:aws:dynamodb"
+                  - Ref: AWS::Region
+                  - Ref: AWS::AccountId
+                  - "table/${self:custom.dynamoDbAppIdTableName}"
 
 #    - Effect: "Allow"
 #      Action:
@@ -65,49 +51,53 @@ plugins:
   - serverless-python-requirements
 
 custom:
-  dynamoDbAppIdTableName: "${self:service.name}-${self:provider.stage}-integratedApps"
+  dynamoDbAppIdTableName: "${self:service}-${self:provider.stage}-integratedApps"
   botEndpoint: "pipelineEvent"
   appleEndpoint: "applePassthroughEvent"
 
 # you can add packaging information here
 package:
-#  include:
-#    - include-me.py
-#    - include-me-dir/**
-  exclude:
-    - minimal_widget.html
-    - payloads.json
-    - package-lock.json
-    - node_modules/**
+  patterns:
+    #    - include-me.py
+    #    - include-me-dir/**
+    - "!minimal_widget.html"
+    - "!payloads.json"
+    - "!package-lock.json"
+    - "!node_modules/**"
+    - "!amb_venv/**"
+    - "!.mypy_chace/**"
+    - "!README.md"
+    = "!future_dev_ideas.txt"
+    - "!*.yml"
 
 functions:
   pipeline:
     handler: handler.${self:custom.botEndpoint}
     timeout: 20
-#    The following are a few example events you can configure
-#    NOTE: Please make sure to change your handler code to work with those events
-#    Check the event documentation for details
+    #    The following are a few example events you can configure
+    #    NOTE: Please make sure to change your handler code to work with those events
+    #    Check the event documentation for details
     events:
       - http:
           path: ${self:custom.botEndpoint}
           method: post
-#      - websocket: $connect
-#      - s3: ${env:BUCKET}
-#      - schedule: rate(10 minutes)
-#      - sns: greeter-topic
-#      - stream: arn:aws:dynamodb:region:XXXXXX:table/foo/stream/1970-01-01T00:00:00.000
-#      - cloudwatchEvent:
-#          event:
-#            source:
-#              - "aws.ec2"
-#            detail-type:
-#              - "EC2 Instance State-change Notification"
-#            detail:
-#              state:
-#                - pending
-#      - cloudwatchLog: '/aws/lambda/hello'
+    #      - websocket: $connect
+    #      - s3: ${env:BUCKET}
+    #      - schedule: rate(10 minutes)
+    #      - sns: greeter-topic
+    #      - stream: arn:aws:dynamodb:region:XXXXXX:table/foo/stream/1970-01-01T00:00:00.000
+    #      - cloudwatchEvent:
+    #          event:
+    #            source:
+    #              - "aws.ec2"
+    #            detail-type:
+    #              - "EC2 Instance State-change Notification"
+    #            detail:
+    #              state:
+    #                - pending
+    #      - cloudwatchLog: '/aws/lambda/hello'
 
-#    Define function environment variables here
+    #    Define function environment variables here
     environment:
       appTableName: ${self:custom.dynamoDbAppIdTableName}
       botStage: ${self:provider.stage}

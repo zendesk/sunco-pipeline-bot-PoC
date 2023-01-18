@@ -4,10 +4,10 @@ from botocore.exceptions import ClientError
 from smooch.rest import ApiException
 from datetime import datetime, timedelta
 from time import sleep
-import smooch, json, os, requests, re#, jwt
+import smooch, json, os, requests, re  # , jwt
 import inspect
 
-#TODO: pass context to Bus.Sys.
+# TODO: pass context to Bus.Sys.
 
 # IMPROVEMENT: Upload attachments/html/css to app on signup?
 
@@ -16,18 +16,18 @@ notificationEndpoints = {
     "procUrl": smooch_root + "/v1/middleware/processors",
     "piplUrl": smooch_root + "/v1/middleware/pipelines",
     "updatePiplUrl": smooch_root + "/v1/middleware/pipelines/appuser",
-    "continueUrl": smooch_root + "/v1/middleware/continue"
+    "continueUrl": smooch_root + "/v1/middleware/continue",
 }
 human_WPM = 80
 minSleep = 1
 
 respones_file = "responses.json"
 
-#(datetime.utcnow()+timedelta(days=2)).strftime("%d-%b")
+# (datetime.utcnow()+timedelta(days=2)).strftime("%d-%b")
 
-#TODO: conversation:start handling + webSDK's startConversation()
-#TODO: onboarding flow
-#TODO: pipeline configuration flow
+# TODO: conversation:start handling + webSDK's startConversation()
+# TODO: onboarding flow
+# TODO: pipeline configuration flow
 # def newSignup(event, context):
 #     # sort by method
 #     # GET: serve signup page
@@ -103,7 +103,7 @@ respones_file = "responses.json"
 #     dynamodb = resource("dynamodb")
 #     appsTable = dynamodb.Table(os.environ['appTableName'])
 #     try:
-#         putResp = appsTable.put_item( Item={ 
+#         putResp = appsTable.put_item( Item={
 #             'appId': appId,
 #             'processorId': processorId,
 #             'processorSecret': processorSecret,
@@ -125,73 +125,87 @@ respones_file = "responses.json"
 #         #     return { "statusCode": 403, "body": " > Forbidden: appId not registered!" }
 #         raise NotImplementedError
 
+
 class mySmooch:
     def __init__(self, appId, appJwt, appUserId):
         self.appId = appId
         self.appUserId = appUserId
 
-        with open(respones_file, 'r') as f:
+        with open(respones_file, "r") as f:
             self.responses = json.load(f)
-        
+
         # Configure API key authorization (alternative): jwt
-        smooch.configuration.api_key['Authorization'] = appJwt
-        smooch.configuration.api_key_prefix['Authorization'] = 'Bearer'
+        smooch.configuration.api_key["Authorization"] = appJwt
+        smooch.configuration.api_key_prefix["Authorization"] = "Bearer"
 
         # create an instance of the API class
         self.convoApi = smooch.ConversationApi()
         self.appUserApi = smooch.AppUserApi()
-        
+
     def getAppUserInfo(self):
-        #print(" > getAppUserInfo()")
+        # print(" > getAppUserInfo()")
         # create an instance of the API class
         appUserApi = smooch.AppUserApi()
 
         try:
             apiResp = appUserApi.get_app_user(self.appId, self.appUserId)
-            #pprint(apiResp)
+            # pprint(apiResp)
         except ApiException as e:
             print("Exception when calling AppUserApi->get_app_user: %s\n" % e)
-            result = { "statusCode": 500, "body": e }
-            #print(" >> Request:\n%s\n >> Result: %s" % (bodyData, result))
+            result = {"statusCode": 500, "body": e}
+            # print(" >> Request:\n%s\n >> Result: %s" % (bodyData, result))
             print(" >> Result: %s" % (result))
             return None
-        #result = { "statusCode": 200, "body": "OK!"}
-        #print(" >> Request:\n%s\n >> Response: %s\n >> Result: %s" % (bodyData, apiResp, result))
+        # result = { "statusCode": 200, "body": "OK!"}
+        # print(" >> Request:\n%s\n >> Response: %s\n >> Result: %s" % (bodyData, apiResp, result))
         return apiResp.app_user.properties, self._findLastSeen(apiResp.app_user.clients)
 
     def updateAppUser(self, properties):
-        app_user_update_body = smooch.AppUserUpdate(properties=properties) # AppUserUpdate | Body for an updateAppUser request.
+        app_user_update_body = smooch.AppUserUpdate(
+            properties=properties
+        )  # AppUserUpdate | Body for an updateAppUser request.
 
         try:
-            userUpdateResp = self.appUserApi.update_app_user(self.appId, self.appUserId, app_user_update_body)
-            #pprint(userUpdateResp)
+            userUpdateResp = self.appUserApi.update_app_user(
+                self.appId, self.appUserId, app_user_update_body
+            )
+            # pprint(userUpdateResp)
         except ApiException as e:
             print("Exception when calling AppUserApi->update_app_user: %s\n" % e)
-            #result = { "statusCode": 500, "body": e }
-            #print(" >> Request:\n%s\n >> Result: %s" % (bodyData, result))
-            #print(" >> Result: %s" % (result))
+            # result = { "statusCode": 500, "body": e }
+            # print(" >> Request:\n%s\n >> Result: %s" % (bodyData, result))
+            # print(" >> Result: %s" % (result))
             return
-        print("appUser properties updated: %s" % str(userUpdateResp.app_user.properties))
+        print(
+            "appUser properties updated: %s" % str(userUpdateResp.app_user.properties)
+        )
         return
 
     def sendTypingIndicator(self, sleepWords=None):
-        #app_id = 'app_id_example' # str | Identifies the app.
-        #user_id = 'user_id_example' # str | Identifies the user. Can be either the smoochId or the userId.
-        conversation_activity_body = smooch.ConversationActivity(role="appMaker", type="typing:start") # ConversationActivity | Body for a triggerConversationActivity request.
+        # app_id = 'app_id_example' # str | Identifies the app.
+        # user_id = 'user_id_example' # str | Identifies the user. Can be either the smoochId or the userId.
+        conversation_activity_body = smooch.ConversationActivity(
+            role="appMaker", type="typing:start"
+        )  # ConversationActivity | Body for a triggerConversationActivity request.
 
         try:
-            api_response = self.convoApi.conversation_activity(self.appId, self.appUserId, conversation_activity_body)
-            #pprint(api_response)
+            api_response = self.convoApi.conversation_activity(
+                self.appId, self.appUserId, conversation_activity_body
+            )
+            # pprint(api_response)
         except ApiException as e:
-            print("Exception when calling ConversationApi->conversation_activity: %s\n" % e)
+            print(
+                "Exception when calling ConversationApi->conversation_activity: %s\n"
+                % e
+            )
         else:
             print("Typing indicator resp: %s" % api_response)
 
         if sleepWords is not None and type(sleepWords) is int:
-            duration = sleepWords / ( human_WPM * 1.5 )
+            duration = sleepWords / (human_WPM * 1.5)
             if duration < minSleep:
                 duration = minSleep
-            sleep( duration )
+            sleep(duration)
 
     def sendMessage(self, messageObj):
         print(" >> sendMessage() got: %s" % messageObj)
@@ -199,211 +213,244 @@ class mySmooch:
         if type(messageObj) is dict:
             pass
         elif type(messageObj) is str:
-            messageObj = { "text": messageObj}
+            messageObj = {"text": messageObj}
         else:
             raise TypeError("Unsupported type %s" % type(messageObj))
 
-        if 'text' in messageObj.keys():
-            self.sendTypingIndicator(len(messageObj['text'].split()))
+        if "text" in messageObj.keys():
+            self.sendTypingIndicator(len(messageObj["text"].split()))
         messageToSend = {
-        # smooch-python key format
+            # smooch-python key format
             "type": "text",
-            "role": "appMaker"
+            "role": "appMaker",
         }
-        if 'role' in messageObj.keys() and messageObj['role'] == 'appMaker':
-            messageToSend.update(self.responses['botPersona'])
-            #print(" > DEV: Updated base msg: %s" % messageToSend)
-        
+        if "role" in messageObj.keys() and messageObj["role"] == "appMaker":
+            messageToSend.update(self.responses["botPersona"])
+            # print(" > DEV: Updated base msg: %s" % messageToSend)
+
         # TODO: check for key collisions?
         # x.update(y) will overwrite x with conflicting values from y
         messageToSend.update(messageObj)
 
-        message_post_body = smooch.MessagePost(**messageToSend) # MessagePost | Body for a postMessage request. Additional arguments are necessary based on message type ([text](https://docs.smooch.io/rest/#text), [image](https://docs.smooch.io/rest/#image), [carousel](https://docs.smooch.io/rest/#carousel), [list](https://docs.smooch.io/rest/#list), [form](https://docs.smooch.io/rest/#form)) 
+        message_post_body = smooch.MessagePost(
+            **messageToSend
+        )  # MessagePost | Body for a postMessage request. Additional arguments are necessary based on message type ([text](https://docs.smooch.io/rest/#text), [image](https://docs.smooch.io/rest/#image), [carousel](https://docs.smooch.io/rest/#carousel), [list](https://docs.smooch.io/rest/#list), [form](https://docs.smooch.io/rest/#form))
 
         print(" >> Trying to send: %s" % messageToSend)
         try:
-            msgPostResp = self.convoApi.post_message(self.appId, self.appUserId, message_post_body)
-            #pprint(msgPostResp)
+            msgPostResp = self.convoApi.post_message(
+                self.appId, self.appUserId, message_post_body
+            )
+            # pprint(msgPostResp)
         except ApiException as e:
             print("Exception when calling ConversationApi->post_message: %s\n" % e)
-            result = { "statusCode": 500, "body": e }
-            #print(" >> Request:\n%s\n >> Result: %s" % (bodyData, result))
+            result = {"statusCode": 500, "body": e}
+            # print(" >> Request:\n%s\n >> Result: %s" % (bodyData, result))
             print(" >> Result: %s" % (result))
             return result
-        result = { "statusCode": 200, "body": str(msgPostResp)}
-        #print(" >> Response: %s\n >> Result: %s" % (msgPostResp, result))
+        result = {"statusCode": 200, "body": str(msgPostResp)}
+        # print(" >> Response: %s\n >> Result: %s" % (msgPostResp, result))
         return result
 
     def escalate(self, nonce):
         passthroughResult = self.passthroughEscalated(nonce)
-        #self.sendMessage({"text": "Please stand by while I get one of Humans to help you ⏳"})
-        self.updateAppUser({ "escalated":True })
-        #self.sendResponses(">>msg>>escalate", nonce) # << gets caught in `start` fallback instead of trying to process the >>msg>> command
+        # self.sendMessage({"text": "Please stand by while I get one of Humans to help you ⏳"})
+        self.updateAppUser({"escalated": True})
+        # self.sendResponses(">>msg>>escalate", nonce) # << gets caught in `start` fallback instead of trying to process the >>msg>> command
 
-        #TODO: return something else if escalation flag update breaks?
-        print("Excecution complete (escalation set) - returning: %s" % passthroughResult)
+        # TODO: return something else if escalation flag update breaks?
+        print(
+            "Excecution complete (escalation set) - returning: %s" % passthroughResult
+        )
         return passthroughResult
 
     def deescalate(self):
-        #TODO: send message?
-        #self.sendMessage({"text": "Please stand by while I get one of Humans to help you ⏳"})
-        self.updateAppUser({ "escalated":False })
-        #TODO: return something else if escalation flag update breaks?
+        # TODO: send message?
+        # self.sendMessage({"text": "Please stand by while I get one of Humans to help you ⏳"})
+        self.updateAppUser({"escalated": False})
+        # TODO: return something else if escalation flag update breaks?
         print("Excecution complete (escalation unset)")
         return True
 
     def passthroughEscalated(self, nonce):
-        continueHdr = { "Authorization": "Bearer %s" % nonce}
-        passthruResp = requests.post(notificationEndpoints['continueUrl'], headers=continueHdr)
+        continueHdr = {"Authorization": "Bearer %s" % nonce}
+        passthruResp = requests.post(
+            notificationEndpoints["continueUrl"], headers=continueHdr
+        )
         if not passthruResp.ok:
-            raise Exception("ERROR: %s signalling `/continue` to smooch: %s" % (passthruResp, passthruResp.content))
+            raise Exception(
+                "ERROR: %s signalling `/continue` to smooch: %s"
+                % (passthruResp, passthruResp.content)
+            )
         else:
-            result = { "statusCode": 200, "body": "message escalated" }
-            print("Excecution complete (message passed through) - returning: %s" % result)
+            result = {"statusCode": 200, "body": "message escalated"}
+            print(
+                "Excecution complete (message passed through) - returning: %s" % result
+            )
             return result
 
     def resetConvo(self, response=None, nonce=None):
-        self.updateAppUser({ "escalated":False, "flow":False })
-        #self.sendMessage(self.responses['reusables'][response])
+        self.updateAppUser({"escalated": False, "flow": False})
+        # self.sendMessage(self.responses['reusables'][response])
         if response is not None:
             self.sendResponses(None, response)  # TODO: needed?
-        #TODO: re-send welcome message ?
-        result = { "statusCode": 200, "body": "escalation/flow flags cleared" }
+        # TODO: re-send welcome message ?
+        result = {"statusCode": 200, "body": "escalation/flow flags cleared"}
         print("Escalation unset - returning: %s" % result)
         return result
 
     def resetFlags(self):
-        self.updateAppUser({ "escalated":False, "flow":False })
-        result = { "statusCode": 200, "body": "escalation/flow flags cleared" }
+        self.updateAppUser({"escalated": False, "flow": False})
+        result = {"statusCode": 200, "body": "escalation/flow flags cleared"}
         print("Escalation unset by resetFlags(); returning: %s" % result)
         return result
 
-    #def sendResponses(self, flow, userText, nonce, data=None, msgType=None):
+    # def sendResponses(self, flow, userText, nonce, data=None, msgType=None):
     def sendResponses(self, userText, nonce=None, data=None, msgType=None):
         print("Starting sendResponses(): '%s'" % (userText))
 
         results = []
         hitType = None
 
-        if msgType == 'formResponse':
-            hit = 'FORM_RESPOSNE'
-            hitType = 'responses'
-        elif userText in self.responses['responses'].keys():
+        if msgType == "formResponse":
+            hit = "FORM_RESPOSNE"
+            hitType = "responses"
+        elif userText in self.responses["responses"].keys():
             # Response keyword in userText
             hit = userText
-            hitType = 'responses'
+            hitType = "responses"
         else:
             # No direct response - check for keywords
-            for pattern in self.responses['text-matches'].keys():
-                if self.responses['text-matches'][pattern]['type'] == "regex" \
-                    and re.search(pattern, userText, re.IGNORECASE):
+            for pattern in self.responses["text-matches"].keys():
+                if self.responses["text-matches"][pattern][
+                    "type"
+                ] == "regex" and re.search(pattern, userText, re.IGNORECASE):
                     hit = pattern
-                    hitType = 'text-matches'
+                    hitType = "text-matches"
                     break
 
         if hitType is None:
             # No keyword hit either - use default
-            print(" > WARNING: Unsupported input %s - using 'default' instead." % userText)
-            hit = 'default'
-            hitType = 'responses'
+            print(
+                " > WARNING: Unsupported input %s - using 'default' instead." % userText
+            )
+            hit = "default"
+            hitType = "responses"
 
-        if hitType == 'responses':
+        if hitType == "responses":
             resp_list = self.responses[hitType][hit]
-        elif hitType == 'text-matches':
+        elif hitType == "text-matches":
             resp_list = self.responses[hitType][hit]["responses"]
 
-        for msg in resp_list:    # Iterate responses
+        for msg in resp_list:  # Iterate responses
             # Process '>>' commands
-            cmdArr = msg.split('>>') if type(msg) is str else None
-            if cmdArr is not None and len(cmdArr) >= 3 and msg.startswith('>>'):
+            cmdArr = msg.split(">>") if type(msg) is str else None
+            if cmdArr is not None and len(cmdArr) >= 3 and msg.startswith(">>"):
                 print("Processing command: %s" % msg)
-                if cmdArr[1] == 'do':           # special command
-                    if cmdArr[2] == 'echo':     # echo user message
+                if cmdArr[1] == "do":  # special command
+                    if cmdArr[2] == "echo":  # echo user message
                         results.append(self.sendMessage("%s" % userText))
-                    elif cmdArr[2] == 'reset': # reset escalation flags
+                    elif cmdArr[2] == "reset":  # reset escalation flags
                         results.append(self.resetConvo())
-                    elif cmdArr[2] == 'escalate': # escalate to bus.sys.
-                        #TODO: check nonce != None; can only handoff from pipeline bot mode
+                    elif cmdArr[2] == "escalate":  # escalate to bus.sys.
+                        # TODO: check nonce != None; can only handoff from pipeline bot mode
                         results.append(self.escalate(nonce))
-                    elif cmdArr[2] == 'deescalate': # deescalate from bus.sys.
+                    elif cmdArr[2] == "deescalate":  # deescalate from bus.sys.
                         results.append(self.deescalate())
-                    elif cmdArr[2].startswith('sleep'): # literally, sleep
+                    elif cmdArr[2].startswith("sleep"):  # literally, sleep
                         sleep(int(cmdArr[2][5:]))
                         results.append("Slept %ss" % int(cmdArr[2][5:]))
-                    elif cmdArr[2].startswith('typing'): # send typing indicator
-                        results.append(self.sendTypingIndicator(0)) # 0=skip sleep in typing-indicator loop
-                    else:   # backend behaviour
-                        raise NotImplementedError("No handling for this 'do' action (yet) in '%s'" % '>>'.join(cmdArr))
-                elif cmdArr[1] == 'react': # simulate user input
-                    #self.sendResponses(flow, '>>'.join(cmdArr[2:]))
-                    results.append(self.sendResponses('>>'.join(cmdArr[2:]).upper(),'>>'.join(cmdArr[2:]), nonce))
-                    #TODO: And this was for...?
-                elif cmdArr[1] == 'msg': # send reusable message
-                    if cmdArr[2] in self.responses['reusables'].keys():
-                        #self.sendMessage({"text": "%s" % self.responses['reusables'][cmdArr[2]]})
-                        results.append(self.sendMessage(self.responses['reusables'][cmdArr[2]]))
+                    elif cmdArr[2].startswith("typing"):  # send typing indicator
+                        results.append(
+                            self.sendTypingIndicator(0)
+                        )  # 0=skip sleep in typing-indicator loop
+                    else:  # backend behaviour
+                        raise NotImplementedError(
+                            "No handling for this 'do' action (yet) in '%s'"
+                            % ">>".join(cmdArr)
+                        )
+                elif cmdArr[1] == "react":  # simulate user input
+                    # self.sendResponses(flow, '>>'.join(cmdArr[2:]))
+                    results.append(
+                        self.sendResponses(
+                            ">>".join(cmdArr[2:]).upper(), ">>".join(cmdArr[2:]), nonce
+                        )
+                    )
+                    # TODO: And this was for...?
+                elif cmdArr[1] == "msg":  # send reusable message
+                    if cmdArr[2] in self.responses["reusables"].keys():
+                        # self.sendMessage({"text": "%s" % self.responses['reusables'][cmdArr[2]]})
+                        results.append(
+                            self.sendMessage(self.responses["reusables"][cmdArr[2]])
+                        )
                     else:
-                        raise KeyError("command error: reusable message '%s' not found" % cmdArr[2])
+                        raise KeyError(
+                            "command error: reusable message '%s' not found" % cmdArr[2]
+                        )
                 else:
-                    raise NotImplementedError("Trying to run unknown command '%s': %s" % (cmdArr[1], msg))
+                    raise NotImplementedError(
+                        "Trying to run unknown command '%s': %s" % (cmdArr[1], msg)
+                    )
             else:  # Send scripted response(s)
-                #results.append( self.sendMessage( {"text": "%s" % msg} ) )
-                results.append( self.sendMessage( msg ) )
-        
-        #TODO: check individual messages succeeded
-        result = { "statusCode": 200, "body": str(results)}
-        #print(" >> Request:\n%s\n >> Response: %s\n >> Result: %s" % (bodyData, msgPostResp, result))
+                # results.append( self.sendMessage( {"text": "%s" % msg} ) )
+                results.append(self.sendMessage(msg))
+
+        # TODO: check individual messages succeeded
+        result = {"statusCode": 200, "body": str(results)}
+        # print(" >> Request:\n%s\n >> Response: %s\n >> Result: %s" % (bodyData, msgPostResp, result))
         return result
 
     @staticmethod
     def _findLastSeen(clientList):
-        #print(" > findLastSeen()...")
-        epoch = datetime.utcfromtimestamp(0) # start at epoch
+        # print(" > findLastSeen()...")
+        epoch = datetime.utcfromtimestamp(0)  # start at epoch
         lastSeen = epoch
         for client in clientList:
-            dt = datetime.strptime(client.last_seen, '%Y-%m-%dT%H:%M:%S.%fZ')
+            dt = datetime.strptime(client.last_seen, "%Y-%m-%dT%H:%M:%S.%fZ")
             if dt > lastSeen:
                 lastSeen = dt
 
         if lastSeen == epoch:
-            raise Exception("no client with lastSeen > epoch on appUser...(!?)\n%s" % clientList)
+            raise Exception(
+                "no client with lastSeen > epoch on appUser...(!?)\n%s" % clientList
+            )
 
         return lastSeen
 
     @staticmethod
     def getUserText(data):
-        if 'message' in data.keys():
-            #postback = None
-            if 'payload' in data['message'].keys():
-                userText = data['message']['payload'].upper().strip()
-            elif 'textFallback' in data['message'].keys():
-                userText = data['message']['textFallback'].upper().strip()
-            elif 'text' in data['message'].keys():
-                userText = data['message']['text'].upper().strip()
+        if "message" in data.keys():
+            # postback = None
+            if "payload" in data["message"].keys():
+                userText = data["message"]["payload"].upper().strip()
+            elif "textFallback" in data["message"].keys():
+                userText = data["message"]["textFallback"].upper().strip()
+            elif "text" in data["message"].keys():
+                userText = data["message"]["text"].upper().strip()
             return userText
-        elif 'postback' in data.keys():
-            #userText = None
-            postback = data['postback']['action']['payload'].upper().strip()
+        elif "postback" in data.keys():
+            # userText = None
+            postback = data["postback"]["action"]["payload"].upper().strip()
             return postback
         else:
             raise Exception("Expecting `message` or `postback` in response")
 
-        #return userText
-    
+        # return userText
+
     @staticmethod
     def getEventTypeOrigin(data):
-        #TODO: needed? (reply on presence or not of Nonce?)
-        if 'nonce' in data.keys():
+        # TODO: needed? (reply on presence or not of Nonce?)
+        if "nonce" in data.keys():
             evtOrigin = "pipeline"
-            #nonce = data['nonce']
+            # nonce = data['nonce']
         else:
             evtOrigin = "webhook"
-            #nonce = None
+            # nonce = None
 
-        evtTrigger = data['trigger']
+        evtTrigger = data["trigger"]
 
         if evtTrigger == "message:appUser":
-            evtType = data['message']['type']
+            evtType = data["message"]["type"]
         elif evtTrigger == "postback":
             evtType = "postback"
         elif evtTrigger == "passthrough:apple:interactive":
@@ -413,41 +460,47 @@ class mySmooch:
 
         return evtType, evtOrigin
 
+
 def lookupAppInDb(appId):
     # Lookup supported app in table
     dynamodb = resource("dynamodb")
-    appsTable = dynamodb.Table(os.environ['appTableName'])
+    appsTable = dynamodb.Table(os.environ["appTableName"])
     try:
-        response = appsTable.get_item( Key={ 'appId': appId } )
+        response = appsTable.get_item(Key={"appId": appId})
     except ClientError as e:
-        print("Table lookup error: %s" % e.response['Error']['Message'])
+        print("Table lookup error: %s" % e.response["Error"]["Message"])
         raise e
     else:
-        if 'Item' in response.keys():
-            appCreds = response['Item']
-            #print("GetItem succeeded %s (App %s is subscribed)" % (appCreds, appId))
+        if "Item" in response.keys():
+            appCreds = response["Item"]
+            # print("GetItem succeeded %s (App %s is subscribed)" % (appCreds, appId))
         else:
             print(" > ERROR: No 'Item' in db response: %s" % response)
-            raise ValueError(json.dumps({"statusCode": 403, "body": " > Forbidden: appId not registered!"}))
+            raise ValueError(
+                json.dumps(
+                    {"statusCode": 403, "body": " > Forbidden: appId not registered!"}
+                )
+            )
 
     return appCreds
 
-def pipelineEvent(event, context):
-    #global bodyData
-    #print("New request: %s" % event)
-    bodyData = json.loads(event['body'])
-    print("Starting %s with %s" % (inspect.stack()[0][3], bodyData)) # DEV
 
-    #TODO: test required values in payload: {
+def pipelineEvent(event, context):
+    # global bodyData
+    # print("New request: %s" % event)
+    bodyData = json.loads(event["body"])
+    print("Starting %s with %s" % (inspect.stack()[0][3], bodyData))  # DEV
+
+    # TODO: test required values in payload: {
     #   "": ['trigger', 'app', 'appUser', 'message', 'nonce'],
     #   "app": ['_id'],
     #   "appUser": ['_id'],
-    #   "message": ['text'] 
-    #if not test_contents(bodyData, structures['message:appUser']):
+    #   "message": ['text']
+    # if not test_contents(bodyData, structures['message:appUser']):
 
-    appId = bodyData['app']['_id']
-    appUserId = bodyData['appUser']['_id']
-    nonce = bodyData['nonce'] if 'nonce' in bodyData.keys() else None
+    appId = bodyData["app"]["_id"]
+    appUserId = bodyData["appUser"]["_id"]
+    nonce = bodyData["nonce"] if "nonce" in bodyData.keys() else None
 
     # get parse event info
     eventType, eventOrigin = mySmooch.getEventTypeOrigin(bodyData)
@@ -456,31 +509,41 @@ def pipelineEvent(event, context):
     appCreds = lookupAppInDb(appId)
 
     # Verify webhook signature
-    if 'X-API-Key' not in event['headers'].keys() or event['headers']['X-API-Key'] != appCreds['processorSecret']:
-        print(" %s == %s" % (event['headers']['X-API-Key'], appCreds['processorSecret']))
-        print("Types: %s, %s" % (type(event['headers']['X-API-Key']), type(appCreds['processorSecret'])))
-        result = { "statusCode": 400, "body": " > Bad Request"}
+    if (
+        "X-API-Key" not in event["headers"].keys()
+        or event["headers"]["X-API-Key"] != appCreds["processorSecret"]
+    ):
+        print(
+            " %s == %s" % (event["headers"]["X-API-Key"], appCreds["processorSecret"])
+        )
+        print(
+            "Types: %s, %s"
+            % (type(event["headers"]["X-API-Key"]), type(appCreds["processorSecret"]))
+        )
+        result = {"statusCode": 400, "body": " > Bad Request"}
         print(" >> Request:\n%s\n >> Result: %s" % (bodyData, result))
         return result
 
     # Configure API key authorization (alternative): jwt
-    smoochApi = mySmooch(appId, appCreds['JWT'], appUserId)
+    smoochApi = mySmooch(appId, appCreds["JWT"], appUserId)
 
     # TODO: check escalation flag + timestamp
     properties, lastSeen = smoochApi.getAppUserInfo()
-    print("appUser properties: %s" % properties)    # DEV
+    print("appUser properties: %s" % properties)  # DEV
     # if 'flow' not in properties.keys():
     #     properties['flow'] = ""
 
     # Check/clear escalation state
     userText = smoochApi.getUserText(bodyData)
-    if 'escalated' in properties.keys() and properties['escalated']:
-        if lastSeen < ( datetime.utcnow() - timedelta(hours=1) ):    # >1h inactive, reset escalation state
+    if "escalated" in properties.keys() and properties["escalated"]:
+        if lastSeen < (
+            datetime.utcnow() - timedelta(hours=1)
+        ):  # >1h inactive, reset escalation state
             print(smoochApi.resetFlags())
-        elif userText in smoochApi.responses['deescalationKeywords']:
+        elif userText in smoochApi.responses["deescalationKeywords"]:
             # Process master keywords
             return smoochApi.sendResponses(userText, nonce, msgType=eventType)
-        else:   # Continue escalation
+        else:  # Continue escalation
             return smoochApi.passthroughEscalated(nonce)
 
     return smoochApi.sendResponses(userText, nonce, msgType=eventType)
@@ -494,22 +557,24 @@ def pipelineEvent(event, context):
     #     "body": json.dumps(body)
     # }
 
+
 # def handleWebhook():
 #     pass
 
-def applePassthroughEvent(event, context):
-    bodyData = json.loads(event['body'])
-    print("Starting %s with %s" % (inspect.stack()[0][3], bodyData)) # DEV
 
-    #TODO: test required values in payload: {
+def applePassthroughEvent(event, context):
+    bodyData = json.loads(event["body"])
+    print("Starting %s with %s" % (inspect.stack()[0][3], bodyData))  # DEV
+
+    # TODO: test required values in payload: {
     #   "": ['trigger', 'app', 'appUser', 'message', 'nonce'],
     #   "app": ['_id'],
     #   "appUser": ['_id'],
-    #   "message": ['text'] 
-    #if not test_contents(bodyData, structures['message:appUser']):
+    #   "message": ['text']
+    # if not test_contents(bodyData, structures['message:appUser']):
 
-    appId = bodyData['app']['_id']
-    appUserId = bodyData['appUser']['_id']
+    appId = bodyData["app"]["_id"]
+    appUserId = bodyData["appUser"]["_id"]
 
     # get parse event info
     eventType, eventOrigin = mySmooch.getEventTypeOrigin(bodyData)
@@ -518,41 +583,50 @@ def applePassthroughEvent(event, context):
     appCreds = lookupAppInDb(appId)
 
     # Verify webhook signature
-    if 'X-API-Key' not in event['headers'].keys() or event['headers']['X-API-Key'] != appCreds['webhookSecret']:
-        print(" %s == %s" % (event['headers']['X-API-Key'], appCreds['webhookSecret']))
-        print("Types: %s, %s" % (type(event['headers']['X-API-Key']), type(appCreds['webhookSecret'])))
-        result = { "statusCode": 400, "body": " > Bad Request"}
+    if (
+        "X-API-Key" not in event["headers"].keys()
+        or event["headers"]["X-API-Key"] != appCreds["webhookSecret"]
+    ):
+        print(" %s == %s" % (event["headers"]["X-API-Key"], appCreds["webhookSecret"]))
+        print(
+            "Types: %s, %s"
+            % (type(event["headers"]["X-API-Key"]), type(appCreds["webhookSecret"]))
+        )
+        result = {"statusCode": 400, "body": " > Bad Request"}
         print(" >> Request:\n%s\n >> Result: %s" % (bodyData, result))
         return result
 
     if eventType != "applePassthrough":
-        result = { "statusCode": 400, "body": " > Bad Request: %s" % eventType}
+        result = {"statusCode": 400, "body": " > Bad Request: %s" % eventType}
         print(" >> Request:\n%s\n >> Result: %s" % (bodyData, result))
         return result
 
     # Configure API key authorization (alternative): jwt
-    smoochApi = mySmooch(appId, appCreds['JWT'], appUserId)
+    smoochApi = mySmooch(appId, appCreds["JWT"], appUserId)
 
-    payload_apple = bodyData['payload']['apple']
-    if 'interactiveDataRef' in payload_apple.keys():
-        #getRefPayload(payload_apple['interactiveDataRef'], payload_apple['id'])
+    payload_apple = bodyData["payload"]["apple"]
+    if "interactiveDataRef" in payload_apple.keys():
+        # getRefPayload(payload_apple['interactiveDataRef'], payload_apple['id'])
         raise NotImplementedError()
-    elif 'interactiveData' in payload_apple.keys():
-        requestIdent = payload_apple['interactiveData']['data']['requestIdentifier']
+    elif "interactiveData" in payload_apple.keys():
+        requestIdent = payload_apple["interactiveData"]["data"]["requestIdentifier"]
         if requestIdent == "support-menu":
-            selectedOption = payload_apple['interactiveData']['data']['listPicker']['sections'][0]['items'][0]['identifier']
+            selectedOption = payload_apple["interactiveData"]["data"]["listPicker"][
+                "sections"
+            ][0]["items"][0]["identifier"]
             print("543: %s" % selectedOption)
             return smoochApi.sendResponses(selectedOption.upper())
         elif requestIdent == "appointment-selector":
-            selectedEvent = payload_apple['interactiveData']['data']['event']
+            selectedEvent = payload_apple["interactiveData"]["data"]["event"]
             print("547: %s" % selectedEvent)
             return smoochApi.sendResponses("timepicker_resp".upper())
         else:
             raise NotImplementedError()
     else:
-        result = { "statusCode": 400, "body": " > Bad Request: 539"}
+        result = {"statusCode": 400, "body": " > Bad Request: 539"}
         print(" >> Request:\n%s\n >> Result: %s" % (bodyData, result))
         return result
+
 
 def linter_smoketest():
     purposely_unused_variable = None
