@@ -49,8 +49,10 @@ provider:
 
 plugins:
   - serverless-python-requirements
+  - serverless-plugin-log-retention
 
 custom:
+  logRetentionIndays: 30
   dynamoDbAppIdTableName: "${self:service}-${self:provider.stage}-integratedApps"
   botEndpoint: "pipelineEvent"
   appleEndpoint: "applePassthroughEvent"
@@ -66,8 +68,9 @@ package:
     - "!node_modules/**"
     - "!amb_venv/**"
     - "!.mypy_chace/**"
-    - "!README.md"
-    = "!future_dev_ideas.txt"
+    - "!sample_code/**"
+    - "!sample_code.zip"
+    - "!*.md"
     - "!*.yml"
 
 functions:

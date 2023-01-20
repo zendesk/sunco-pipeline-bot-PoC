@@ -1,3 +1,4 @@
 smooch
 requests
 pyjwt
+# boto3 # already present in AWS instance

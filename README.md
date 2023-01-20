@@ -16,34 +16,26 @@
         * Body: `{ "target" : "https://<UNIQUE-ID>.execute-api.us-west-2.amazonaws.com/dev/pipelineEvent","triggers": ["message:appUser", "postback"] }`
             * `<UNIQUE-ID>` [the full URL, actually] will come from the deploy step's output
         * 📝 Note the `processor._id` in the response (used in the next API-call)
+        * 📝 Note the `processor.secret` in the response (used in the DynamoDB object)
     1. Read/Update to add your processor to the `appuser` pipeline
         * `PUT @ {{url}}/v1/middleware/pipelines/appuser`
         * Body: `[ "<processor._id>" ]`
     1. Create your Apple-interactive passthrough webhook
         * `POST @ {{url}}/v1.1/apps/{{appId}}/webhooks`
-        * Body: `{ "target": "https://5ex8r0tp13.execute-api.us-west-2.amazonaws.com/dev/applePassthroughEvent", "triggers": ["passthrough:apple:interactive"] }`
+        * Body: `{ "target": "https://<UNIQUE-ID>.execute-api.us-west-2.amazonaws.com/dev/applePassthroughEvent", "triggers": ["passthrough:apple:interactive"] }`
+        * 📝 Note the `webhook.secret` in the response (used in the DynamoDB object)
+    1. create a webhook for events when customer blocks the business (`client:update`) as well as group, intent and `capabilityList` (`conversation:create`) for new contacts
+        * `POST @ {{url}}/v2/apps/{{appId}}/integrations`
+        * Body: `{ "webhooks": [{ "version": "v2", "target": "https://webhook.site/02707106-f7ac-4205-9ac7-c5fd5aa512bb", "triggers": ["client:update", "conversation:create"], }], "type": "custom" }`
 1. Prepare your DynamoDb table+entry:
     1. [Default] Table name: `AMB-pipeline-bot-PoC-dev-integratedApps` (created by serverless.yml values) accessible from the [AWS console: DynamoDB](https://us-west-2.console.aws.amazon.com/dynamodbv2/home?region=us-west-2#tables)
     1. Create a new entry for your now-configured app (example below)
-1. Setup a customer-facing channel for testing.
-    * If you are using WebSDK as a channel via `minimial_widget.html`:
-    * replace `<<smooch integrationId Here>>` with your smooch web integrationId (it should still be within single-`'` or double-quotes`"`
-    * for best results, serve the `minimal_widget.html` page via a server (e.g.: `python3 -m http.server [8000] && open http://127.0.0.1:8000/minimal_widget.html`)
-
-NOTE: Still getting CORS errors when trying to test (both `file:///` and with `http.server`)
-```
-Access to fetch at 'https://5f2319f57dc00a000d8f0de7.config.smooch.io/sdk/v2/integrations/5f2319f57dc00a000d8f0de7/config' from origin 'http://127.0.0.1:8000' has been blocked by CORS policy: Response to preflight request doesn't pass access control check: No 'Access-Control-Allow-Origin' header is present on the requested resource. If an opaque response serves your needs, set the request's mode to 'no-cors' to fetch the resource with CORS disabled.
-5f2319f57dc00a000d8f0de7.config.smooch.io/sdk/v2/integrations/5f2319f57dc00a000d8f0de7/config:1          Failed to load resource: net::ERR_FAILED
-frame.5.5.4.min.js:2                  Uncaught (in promise) TypeError: Failed to fetch
-    at frame.5.5.4.min.js:2:73722
-    at frame.5.5.4.min.js:2:863437
-    at dispatch (frame.5.5.4.min.js:2:148051)
-    at frame.5.5.4.min.js:2:172034
-    at Object.dispatch (frame.5.5.4.min.js:2:863437)
-    at Module.ec (frame.5.5.4.min.js:2:856635)
-    at A (smooch.5.5.4.min.js:2:4465)
-    at frame.5.5.4.min.js:2:360203
-```
+1. Setup AMB channel for testing
+    * login to register.apple.com
+        * get your BusinessId
+        * copy your `Conversational link` e.g.: `https://register.apple.com/messages/<buinessId>/review`
+    * integrate using app.smooch.io (dashboard or Advocacy assistance required)
+1. click the link from a Mac or i-device to test
 
 Your bot should now be functional and [auto-]responding!
 
@@ -69,7 +61,8 @@ Key groups are:
     "JWT": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6ImFwcF81ZGE4eHh4eHh4eHh4eHh4eHh4eDg3YTIifQ.eyJzY29wZSI6ImFwcCIsImlhdCI6MTU3MTMxODg4Mn0.<signature>",
     "owner": "My-PoC",
     "processorId": "5da8xxxxxxxxxxxxxxxx626f",
-    "processorSecret": "gUECxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxKyzw"
+    "processorSecret": "gUECxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxKyzw",
+    "webhookSecret": "nth8xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxSG4A"
 }
 ```
 

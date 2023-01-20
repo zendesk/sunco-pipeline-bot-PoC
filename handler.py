@@ -4,6 +4,7 @@ from botocore.exceptions import ClientError
 from smooch.rest import ApiException
 from datetime import datetime, timedelta
 from time import sleep
+from uuid import uuid4
 import smooch, json, os, requests, re  # , jwt
 import inspect
 
@@ -421,12 +422,14 @@ class mySmooch:
     def getUserText(data):
         if "message" in data.keys():
             # postback = None
-            if "payload" in data["message"].keys():
+            if "payload" in data["message"].keys():  # postbacks(?)
                 userText = data["message"]["payload"].upper().strip()
             elif "textFallback" in data["message"].keys():
                 userText = data["message"]["textFallback"].upper().strip()
             elif "text" in data["message"].keys():
                 userText = data["message"]["text"].upper().strip()
+            elif "altText" in data["message"].keys():
+                userText = data["message"]["altText"].upper().strip()
             return userText
         elif "postback" in data.keys():
             # userText = None
@@ -548,19 +551,6 @@ def pipelineEvent(event, context):
 
     return smoochApi.sendResponses(userText, nonce, msgType=eventType)
 
-    # body = {
-    #     "message": "Go Serverless v1.0! Your function executed successfully!",
-    #     "input": event
-    # }
-    # response = {
-    #     "statusCode": 200,
-    #     "body": json.dumps(body)
-    # }
-
-
-# def handleWebhook():
-#     pass
-
 
 def applePassthroughEvent(event, context):
     bodyData = json.loads(event["body"])
@@ -587,7 +577,10 @@ def applePassthroughEvent(event, context):
         "X-API-Key" not in event["headers"].keys()
         or event["headers"]["X-API-Key"] != appCreds["webhookSecret"]
     ):
-        print(" %s == %s" % (event["headers"]["X-API-Key"], appCreds["webhookSecret"]))
+        print(
+            " Error: %s != %s"
+            % (event["headers"]["X-API-Key"], appCreds["webhookSecret"])
+        )
         print(
             "Types: %s, %s"
             % (type(event["headers"]["X-API-Key"]), type(appCreds["webhookSecret"]))
@@ -607,21 +600,77 @@ def applePassthroughEvent(event, context):
     payload_apple = bodyData["payload"]["apple"]
     if "interactiveDataRef" in payload_apple.keys():
         # getRefPayload(payload_apple['interactiveDataRef'], payload_apple['id'])
-        raise NotImplementedError()
+        raise NotImplementedError("interactiveDataRef")
     elif "interactiveData" in payload_apple.keys():
         requestIdent = payload_apple["interactiveData"]["data"]["requestIdentifier"]
-        if requestIdent == "support-menu":
+        if requestIdent == "list-picker":
+            # if len(payload_apple["interactiveData"]["data"]["listPicker"][
+            #     "sections"
+            # ])>1:
+            #     raise NotImplementedError
             selectedOption = payload_apple["interactiveData"]["data"]["listPicker"][
                 "sections"
             ][0]["items"][0]["identifier"]
             print("543: %s" % selectedOption)
-            return smoochApi.sendResponses(selectedOption.upper())
-        elif requestIdent == "appointment-selector":
-            selectedEvent = payload_apple["interactiveData"]["data"]["event"]
-            print("547: %s" % selectedEvent)
-            return smoochApi.sendResponses("timepicker_resp".upper())
+        elif requestIdent == "time-picker":
+            eventId = payload_apple["interactiveData"]["data"]["event"]["identifier"]
+            if len(payload_apple["interactiveData"]["data"]["event"]["timeslots"]) > 1:
+                raise ValueError(
+                    "Expecting a single event, got: ",
+                    payload_apple["interactiveData"]["data"]["event"]["timeslots"],
+                )
+            selectedOption = payload_apple["interactiveData"]["data"]["event"][
+                "timeslots"
+            ][0]["identifier"]
+            # << identifiers stripped for simplicity>>
+            # { "type": "interactive",
+            #     "locale": "en_CA",
+            #     "interactiveData": {
+            #         "data": {
+            #             "requestIdentifier": "appointment-selector",
+            #             "replyMessage": {
+            #                 "title": "Feb 24, 2023 at 05:00",
+            #                 "style": "icon",
+            #                 "alternateTitle": "Feb 24, 2023 at 05:00",
+            #             },
+            #             "event": {
+            #                 "timeslots": [ {
+            #                         "identifier": "7am UTC",
+            #                         "duration": 3600,
+            #                         "startTime": "2023-02-24T10:00+0000",
+            #                 } ],
+            #                 "identifier": "reservation-id",
+            #                 "title": "Available Reservations",
+            #                 "timezoneOffset": -300,
+            #             },
+            #             "receivedMessage": {
+            #                 "title": "Book an agent (options are 10, and 14 UTC)",
+            #                 "style": "icon",
+            #             },
+            #         },
+            #     },
+            # }
+        elif requestIdent == "quick-replies":
+            selectedIndex = payload_apple["data"]["quick-reply"]["selectedIndex"]
+            selectedOption = payload_apple["data"]["quick-reply"]["items"][
+                selectedIndex
+            ]["identifier"]
+            print("547: %s" % selectedOption)
+            # << identifiers stripped >>
+            # { "quick-reply":
+            #     {   "items": [
+            #             {"identifier": "1", "title": "Watch our video"},
+            #             {"identifier": "2", "title": "Ask for office hours"},
+            #             {"identifier": "3", "title": "Find more about pet adoption"},
+            #             {"title": "Talk to an agent", "identifier": "4"}, ],
+            #         "selectedIndex": 3,
+            #         "selectedIdentifier": "4", },
+            #     "requestIdentifier": "quick-replies",
+            # }
         else:
-            raise NotImplementedError()
+            raise NotImplementedError("unexpected payload\n", payload_apple)
+
+        return smoochApi.sendResponses(selectedOption.upper())
     else:
         result = {"statusCode": 400, "body": " > Bad Request: 539"}
         print(" >> Request:\n%s\n >> Result: %s" % (bodyData, result))
