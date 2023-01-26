@@ -56,22 +56,29 @@ custom:
   dynamoDbAppIdTableName: "${self:service}-${self:provider.stage}-integratedApps"
   botEndpoint: "pipelineEvent"
   appleEndpoint: "applePassthroughEvent"
+  pythonrequirements:
+    slim: true
+    nodeploy:
+      - boto3
+      - urllib3
 
 # you can add packaging information here
 package:
   patterns:
     #    - include-me.py
     #    - include-me-dir/**
-    - "!minimal_widget.html"
     - "!payloads.json"
     - "!package-lock.json"
     - "!node_modules/**"
     - "!amb_venv/**"
-    - "!.mypy_chace/**"
-    - "!sample_code/**"
-    - "!sample_code.zip"
+    - "!__pycache__/**"
+    - "!*.dist-info/**"
+    - "!sample-code/**"
+    - "!apple_sample-code.zip"
+    - "!sample_payloads.json"
     - "!*.md"
     - "!*.yml"
+    - "!minimal_widget.html"
 
 functions:
   pipeline:

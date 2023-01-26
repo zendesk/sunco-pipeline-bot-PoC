@@ -5,7 +5,7 @@ from smooch.rest import ApiException
 from datetime import datetime, timedelta
 from time import sleep
 from uuid import uuid4
-import smooch, json, os, requests, re  # , jwt
+import smooch, json, os, requests, re
 import inspect
 
 # TODO: pass context to Bus.Sys.
@@ -275,6 +275,7 @@ class mySmooch:
 
     def passthroughEscalated(self, nonce):
         continueHdr = {"Authorization": "Bearer %s" % nonce}
+        # TODO: use urllib3 instead (Lambda-native lib)
         passthruResp = requests.post(
             notificationEndpoints["continueUrl"], headers=continueHdr
         )

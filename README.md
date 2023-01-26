@@ -35,11 +35,22 @@
         * get your BusinessId
         * copy your `Conversational link` e.g.: `https://register.apple.com/messages/<buinessId>/review`
     * integrate using app.smooch.io (dashboard or Advocacy assistance required)
-1. click the link from a Mac or i-device to test
+    * add any testers' appleId email to the list [of developers]
+1. click the link from a Mac [or i-device] to test
 
 Your bot should now be functional and [auto-]responding!
 
 You can customize/update your responses in responses.json file and then `sls deploy`
+
+### AWS Access
+
+* get `Amazon Web Services ZIG` SSO app
+* install/configure `saml2aws`
+* (`serverless.yml` specifies to use the `saml` aws-profile)
+
+DON'T FORGET TO BE ON VPN FIRST!
+
+Pro-tip: set `alias sls='saml2aws login && sls` to auto-login when needed
 
 ## Bot behaviour
 
@@ -51,7 +62,13 @@ The responses file scripts the responses that the bot will send to unescalated u
 Key groups are:
 << COMING SOON >>
 
-## Examples
+## AW Demos
+
+To demonstrate Apple types in AW, the payloads will need to be added as [Smooch templates](https://docs.smooch.io/rest/v1/#templates) and invoked via `%((tmeplate:<name>))%` [shorthand syntax](https://docs.smooch.io/guide/shorthand/#shorthand), with or without an agent macro.
+
+You can likely use the apply-type payloads from `responses.json` as long as any vaiables within are resolved.
+
+## Example objects
 
 ### DynamoDB 'approved Apps' table entry
 
