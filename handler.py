@@ -344,6 +344,7 @@ class mySmooch:
             # Process '>>' commands
             cmdArr = msg.split(">>") if type(msg) is str else None
             if cmdArr is not None and len(cmdArr) >= 3 and msg.startswith(">>"):
+
                 print("Processing command: %s" % msg)
                 if cmdArr[1] == "do":  # special command
                     if cmdArr[2] == "echo":  # echo user message
