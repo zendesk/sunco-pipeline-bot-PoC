@@ -1,8 +1,0 @@
-- send welcome on `conversation:start`
-- allow users to `register` their own app via a landing page
-- serve static resources as attachments
-- apply custom app Icon
-- command: notify(channel, msg)
-- `postback` passthough doesn't open a new ticket (another user message required)
-- eliminate responses.json by using templates
-    - Then the landing page can also configure templates 

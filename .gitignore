@@ -18,3 +18,7 @@ var/
 
 # Serverless directories
 .serverless
+
+# Python3 venv
+amb_venv/*
+sample-code/*
