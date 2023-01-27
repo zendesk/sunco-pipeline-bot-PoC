@@ -2,6 +2,37 @@
   "demoDescription": "Triage Bot with Human handoff",
   "responses": {
     "default": [">>msg>>welcome"],
+    "GUIDE": ["Thanks for selecting Zendesk Guide!"],
+    "CHAT": ["Thanks for selecting Zendesk Chat!"],
+    "SUPPORT": ["Thanks for selecting Zendesk Support!"],
+    "EXPLORE": ["Thanks for selecting Zendesk Explore!"],
+    "SUNSHINE": ["Thanks for selecting Zendesk Sunshine!"],
+    "GIF": [
+      ">>do>>typing",
+      "Hold on and guess who’s behind this mask while I pull up your account. ![](https://media.smooch.io/apps/5dd2f091d098f60011d2d63f/Eqds0d_GukVCjtvULvzd4AdX/flamingo.gif)"
+    ],
+    "NEAT IMESSAGE EXTENSION": ["I'm glad you enjoyed it! 😁"],
+    "AGENT": [">>react>>escalate"],
+    "HUMAN": [">>react>>escalate"],
+    "ESCALATE": [">>do>>escalate", ">>msg>>escalate"],
+    "BOT": [">>react>>deescalate"],
+    "DEESCALATE": [
+      ">>do>>deescalate",
+      "Welcome back!",
+      ">>msg>>deescalate",
+      "Can I help you with anything else?"
+    ],
+    "RESTART": [">>react>>reset"],
+    "RESET": [">>do>>deescalate", "Sure! Starting over! 😁", ">>react>>start"]
+  },
+  "regex-matches": {
+    "[12]?[0-9]-[FLAUCJERDVOMBYSPGTN]{3} [1-2]?[0-9][AP]M UTC": [
+      "Appointment booked!"
+    ],
+    "[🌮🌯🍰🍨].*": ["Oooh! You're making me hungry!"],
+    "liked “.*": ["Thanks for the `Like` 👍"],
+    "^[0-4]$": ["Good guess... but nope!"],
+    "[A-Z]\\.[A-Z{3}]": ["Cool file!"],
     "TEXT": ["Bonjour! Êtez-vous content aujourd'hui? 😅"],
     "TYPING": ["If you insist...", ">>do>>sleep1", ">>do>>typing"],
     "QUICK_REPLY": [
@@ -127,7 +158,8 @@
         }
       }
     ],
-    "FORM": [
+    "FORM_CUSTOM": [
+      ">>do>>typing",
       {
         "text": "{{ Sent Food ListPicker to Apple User }}",
         "type": "text",
@@ -139,10 +171,10 @@
               "interactiveData": {
                 "bid": "com.apple.messages.MSMessageExtensionBalloonPlugin:0000000000:com.apple.icloud.apps.messages.business.extension",
                 "data": {
-                  "version": 1.0,
+                  "version": "1.0",
                   "requestIdentifier": "form",
                   "dynamic": {
-                    "version": 1.1,
+                    "version": "1.1",
                     "template": "messageForms",
                     "data": {
                       "startPageIdentifier": "form-page-select",
@@ -242,18 +274,10 @@
         }
       }
     ],
-    "FILE": [
+    "FORM": [
       ">>do>>typing",
       {
-        "type": "file",
-        "media_url": "https://media.smooch.io/apps/5f2319f57dc00a000d8f0de7/conversations/5d1e2bcf54205770016b304c/QSY65lOuI-aB9QcRHEuqI0GZ/zendesk-cx-trends-2023.pdf"
-      }
-    ],
-    "LIST PICKER": [">>react>>listpicker"],
-    "LISTPICKER": [
-      ">>do>>typing",
-      {
-        "text": "{{ Sent number-guesser ListPicker to Apple User }}",
+        "text": "{{ Sent Food ListPicker to Apple User }}",
         "type": "text",
         "role": "appMaker",
         "override": {
@@ -264,53 +288,202 @@
                 "bid": "com.apple.messages.MSMessageExtensionBalloonPlugin:0000000000:com.apple.icloud.apps.messages.business.extension",
                 "data": {
                   "version": "1.0",
-                  "requestIdentifier": "list-picker",
-                  "listPicker": {
-                    "sections": [
-                      {
-                        "title": "What number am I thinking of?",
-                        "order": 0,
-                        "items": [
-                          {
-                            "title": "0",
-                            "order": 0,
-                            "identifier": "0"
-                          },
-                          {
-                            "title": "1",
-                            "order": 1,
-                            "identifier": "1"
-                          },
-                          {
-                            "title": "2",
-                            "order": 2,
-                            "identifier": "2"
-                          },
-                          {
-                            "title": "3",
-                            "order": 3,
-                            "identifier": "3"
-                          },
-                          {
-                            "title": "4",
-                            "order": 4,
-                            "identifier": "4"
+                  "requestIdentifier": "form",
+                  "dynamic": {
+                    "version": "1.1",
+                    "template": "messageForms",
+                    "data": {
+                      "startPageIdentifier": "0",
+                      "showSummary": true,
+                      "splash": {
+                        "header": "Apple Card",
+                        "splashtext": "Kindly answer the following questions to help us dispute this transaction.",
+                        "buttonTitle": "Continue",
+                        "imageIdentifier": "2"
+                      },
+                      "pages": [
+                        {
+                          "pageIdentifier": "0",
+                          "type": "select",
+                          "title": "Type of Product",
+                          "subtitle": "Was the merchandise you received defective or not as the merchant described?",
+                          "multipleSelection": true,
+                          "nextPageIdentifier": "1",
+                          "items": [
+                            {
+                              "title": "Option 1",
+                              "value": "option1",
+                              "identifier": "001"
+                            },
+                            {
+                              "title": "Option 2",
+                              "value": "option2",
+                              "identifier": "002"
+                            },
+                            {
+                              "title": "Option 3",
+                              "value": "option3",
+                              "identifier": "003"
+                            },
+                            {
+                              "title": "Option 4",
+                              "value": "option4",
+                              "identifier": "004"
+                            },
+                            {
+                              "title": "Option 5",
+                              "value": "option5",
+                              "identifier": "005"
+                            },
+                            {
+                              "title": "Option 6",
+                              "value": "option6",
+                              "identifier": "006"
+                            }
+                          ]
+                        },
+                        {
+                          "pageIdentifier": "1",
+                          "type": "select",
+                          "title": "Item Condition",
+                          "subtitle": "Was the merchandise you received defective or not as the merchant described?",
+                          "multipleSelection": false,
+                          "items": [
+                            {
+                              "title": "Defective",
+                              "value": "defective",
+                              "identifier": "101",
+                              "nextPageIdentifier": "2"
+                            },
+                            {
+                              "title": "Not as described",
+                              "value": "notAsDescribed",
+                              "identifier": "102",
+                              "nextPageIdentifier": "3"
+                            }
+                          ]
+                        },
+                        {
+                          "pageIdentifier": "2",
+                          "type": "select",
+                          "title": "Supporting Documents",
+                          "subtitle": "Do you have any supporting documents that demonstrate that the product quality was not sufficient?",
+                          "multipleSelection": false,
+                          "items": [
+                            {
+                              "title": "Yes",
+                              "value": "yes",
+                              "identifier": "201",
+                              "nextPageIdentifier": "3"
+                            },
+                            {
+                              "title": "No",
+                              "value": "no",
+                              "identifier": "202",
+                              "nextPageIdentifier": "3"
+                            }
+                          ]
+                        },
+                        {
+                          "pageIdentifier": "3",
+                          "type": "picker",
+                          "pickerTitle": "Select Your Region",
+                          "nextPageIdentifier": "4",
+                          "items": [
+                            {
+                              "title": "APAC",
+                              "value": "apac",
+                              "identifier": "301"
+                            },
+                            {
+                              "title": "EMEA",
+                              "value": "emea",
+                              "identifier": "302"
+                            },
+                            {
+                              "title": "LATAM",
+                              "value": "latam",
+                              "identifier": "303"
+                            },
+                            {
+                              "title": "NAM",
+                              "value": "nam",
+                              "identifier": "304"
+                            }
+                          ]
+                        },
+                        {
+                          "pageIdentifier": "4",
+                          "type": "datePicker",
+                          "title": "Retrieval Date",
+                          "subtitle": "What date did you receive, or expect to receive the product?",
+                          "nextPageIdentifier": "5",
+                          "options": {
+                            "startDate": "2020-02-12",
+                            "maximumDate": "2020-02-13",
+                            "minimumDate": "2020-01-01",
+                            "dateFormat": "MM/dd/yyyy"
                           }
-                        ]
-                      }
-                    ]
-                  }
+                        },
+                        {
+                          "pageIdentifier": "5",
+                          "type": "input",
+                          "title": "Remaining Issues",
+                          "subtitle": "Please provide details about remaining issue",
+                          "nextPageIdentifier": "6",
+                          "options": {
+                            "required": true,
+                            "inputType": "multiline",
+                            "maximumCharacterCount": 300,
+                            "keyboardType": "UIKeyboardTypeEmailAddress"
+                          }
+                        },
+                        {
+                          "pageIdentifier": "6",
+                          "type": "input",
+                          "title": "Product name",
+                          "subtitle": "Please provide name of the product",
+                          "options": {
+                            "required": false,
+                            "inputType": "singleline",
+                            "maximumCharacterCount": 25,
+                            "keyboardType": "UIKeyboardTypePhonePad"
+                          },
+                          "submitForm": true
+                        }
+                      ]
+                    }
+                  },
+                  "images": [
+                    {
+                      "data": "base64encoded-image-file",
+                      "identifier": "1"
+                    },
+                    {
+                      "data": "base64encoded-image-file",
+                      "identifier": "2"
+                    },
+                    {
+                      "data": "base64encoded-image-file",
+                      "identifier": "3"
+                    },
+                    {
+                      "data": "base64encoded-image-file",
+                      "identifier": "4"
+                    }
+                  ]
                 },
                 "receivedMessage": {
-                  "style": "large",
-                  "title": "Single-section ListPicker",
-                  "subtitle": "What number am I thinking of?",
+                  "title": "Apple Card Dispute Form",
+                  "subtitle": "Please fill out the following dispute form.",
+                  "style": "small",
                   "imageIdentifier": "1"
                 },
                 "replyMessage": {
+                  "title": "Tap to view your response.",
+                  "subtitle": "",
                   "style": "small",
-                  "title": "Selected option",
-                  "subtitle": "Survey says..."
+                  "imageIdentifier": "1"
                 }
               }
             }
@@ -318,6 +491,15 @@
         }
       }
     ],
+    "FILE": [
+      ">>do>>typing",
+      {
+        "type": "file",
+        "media_url": "https://media.smooch.io/apps/5f2319f57dc00a000d8f0de7/conversations/5d1e2bcf54205770016b304c/QSY65lOuI-aB9QcRHEuqI0GZ/zendesk-cx-trends-2023.pdf"
+      }
+    ],
+    "LIST PICKER": [">>react>>listpicker"],
+
     "LISTPICKER_MULTI": [
       ">>do>>typing",
       {
@@ -457,8 +639,7 @@
         }
       }
     ],
-    "LISTPICKER_IMAGE": [">>react>>listpicker_images"],
-    "LISTPICKER_IMAGES": [
+    "LISTPICKER_IMAGE": [
       ">>do>>typing",
       {
         "text": "{{ Sent Products ListPicker+images to Apple User }}",
@@ -564,62 +745,69 @@
         }
       }
     ],
-    "GUIDE": ["Thanks for selecting Zendesk Guide!"],
-    "CHAT": ["Thanks for selecting Zendesk Chat!"],
-    "SUPPORT": ["Thanks for selecting Zendesk Support!"],
-    "EXPLORE": ["Thanks for selecting Zendesk Explore!"],
-    "SUNSHINE": ["Thanks for selecting Zendesk Sunshine!"],
-    "GIF": [
-      ">>do>>typing",
-      "Hold on and guess who’s behind this mask while I pull up your account. ![](https://media.smooch.io/apps/5dd2f091d098f60011d2d63f/Eqds0d_GukVCjtvULvzd4AdX/flamingo.gif)"
-    ],
-    "TIMEPICKER": [
+    "LISTPICKER": [
       ">>do>>typing",
       {
-        "text": "{{ Sent Support Appointment TimePicker to Apple User }}",
+        "text": "{{ Sent number-guesser ListPicker to Apple User }}",
+        "type": "text",
         "role": "appMaker",
         "override": {
           "apple": {
             "payload": {
+              "type": "interactive",
               "interactiveData": {
                 "bid": "com.apple.messages.MSMessageExtensionBalloonPlugin:0000000000:com.apple.icloud.apps.messages.business.extension",
                 "data": {
-                  "event": {
-                    "identifier": "appointment-selector",
-                    "timeslots": [
+                  "version": "1.0",
+                  "requestIdentifier": "list-picker",
+                  "listPicker": {
+                    "sections": [
                       {
-                        "duration": 3600,
-                        "identifier": "24-Feb 7am UTC",
-                        "startTime": "2023-2-24T10:00+0000"
-                      },
-                      {
-                        "duration": 3600,
-                        "identifier": "24-Mar 2pm UTC",
-                        "startTime": "2023-3-24T14:00+0000"
+                        "title": "What number am I thinking of?",
+                        "order": 0,
+                        "items": [
+                          {
+                            "title": "0",
+                            "order": 0,
+                            "identifier": "0"
+                          },
+                          {
+                            "title": "1",
+                            "order": 1,
+                            "identifier": "1"
+                          },
+                          {
+                            "title": "2",
+                            "order": 2,
+                            "identifier": "2"
+                          },
+                          {
+                            "title": "3",
+                            "order": 3,
+                            "identifier": "3"
+                          },
+                          {
+                            "title": "4",
+                            "order": 4,
+                            "identifier": "4"
+                          }
+                        ]
                       }
-                    ],
-                    "timezoneOffset": -300,
-                    "title": "Available Reservations",
-                    "location": {
-                      "latitute": 45.511573,
-                      "longitude": -73.556091,
-                      "radius": 20,
-                      "title": "Zendesk Montreal"
-                    }
-                  },
-                  "mspVersion": "1.0",
-                  "requestIdentifier": "time-picker"
+                    ]
+                  }
                 },
                 "receivedMessage": {
-                  "style": "icon",
-                  "title": "Book a consultation\n(options are 10, and 14 UTC)"
+                  "style": "large",
+                  "title": "Single-section ListPicker",
+                  "subtitle": "What number am I thinking of?",
+                  "imageIdentifier": "1"
                 },
                 "replyMessage": {
-                  "style": "icon",
-                  "title": "Your appointment"
+                  "style": "small",
+                  "title": "Selected option",
+                  "subtitle": "Survey says..."
                 }
-              },
-              "type": "interactive"
+              }
             }
           }
         }
@@ -692,13 +880,57 @@
       "Hello again!\nIt's time for your appointment!",
       "Let me know when you're ready to be connected to an agent."
     ],
-    "OAUTH_COMPLETE": [
-      "Awesome! Thanks!",
-      ">>react>>gif",
+    "TIMEPICKER": [
       ">>do>>typing",
-      ">>do>>sleep5",
-      "OK, it looks like you need to talk to an agent to upgrade your More™️ package to unlock this show.",
-      "Shall I connect you with an Agent?"
+      {
+        "text": "{{ Sent Support Appointment TimePicker to Apple User }}",
+        "role": "appMaker",
+        "override": {
+          "apple": {
+            "payload": {
+              "interactiveData": {
+                "bid": "com.apple.messages.MSMessageExtensionBalloonPlugin:0000000000:com.apple.icloud.apps.messages.business.extension",
+                "data": {
+                  "event": {
+                    "identifier": "appointment-selector",
+                    "timeslots": [
+                      {
+                        "duration": 3600,
+                        "identifier": "24-Feb 7am UTC",
+                        "startTime": "2023-2-24T10:00+0000"
+                      },
+                      {
+                        "duration": 3600,
+                        "identifier": "24-Mar 2pm UTC",
+                        "startTime": "2023-3-24T14:00+0000"
+                      }
+                    ],
+                    "timezoneOffset": -300,
+                    "title": "Available Reservations",
+                    "location": {
+                      "latitute": 45.511573,
+                      "longitude": -73.556091,
+                      "radius": 20,
+                      "title": "Zendesk Montreal"
+                    }
+                  },
+                  "mspVersion": "1.0",
+                  "requestIdentifier": "time-picker"
+                },
+                "receivedMessage": {
+                  "style": "icon",
+                  "title": "Book a consultation\n(options are 10, and 14 UTC)"
+                },
+                "replyMessage": {
+                  "style": "icon",
+                  "title": "Your appointment"
+                }
+              },
+              "type": "interactive"
+            }
+          }
+        }
+      }
     ],
     "IMESSAGE_APP": [
       {
@@ -740,7 +972,6 @@
         }
       }
     ],
-    "NEAT IMESSAGE EXTENSION": ["I'm glad you enjoyed it! 😁"],
     "AGENT": [">>react>>escalate"],
     "HUMAN": [">>react>>escalate"],
     "ESCALATE": [">>do>>escalate", ">>msg>>escalate"],
@@ -751,46 +982,7 @@
       ">>msg>>deescalate",
       "Can I help you with anything else?"
     ],
-    "RESTART": [">>react>>reset"],
-    "RESET": [">>do>>deescalate", "Sure! Starting over! 😁", ">>react>>start"]
-  },
-  "text-matches": {
-    "[12]?[0-9]-[FLAUCJERDVOMBYSPGTN]{3} [1-2]?[0-9][AP]M UTC": {
-      "type": "regex",
-      "IGNORECASE": true,
-      "responses": ["Appointment booked!"]
-    },
-    "[0-4]": {
-      "type": "regex",
-      "IGNORECASE": true,
-      "responses": ["Good guess... but nope!"]
-    },
-    "liked “.*": {
-      "type": "regex",
-      "IGNORECASE": true,
-      "responses": ["Thanks for the `Like` 👍"]
-    },
-    "masked.?singer": {
-      "type": "regex",
-      "IGNORECASE": true,
-      "responses": [
-        "The Masked Singer? I love that show! 👨‍🎤",
-        "I’m going to need you to login to verify your identity:"
-      ]
-    },
-    "schedule.*later|later.*schedule": {
-      "type": "regex",
-      "IGNORECASE": true,
-      "responses": [
-        "No problem! When would you prefer to speak with an agent?",
-        ">>react>>timepicker"
-      ]
-    },
-    "ready": {
-      "type": "regex",
-      "IGNORECASE": true,
-      "responses": [">>do>>escalate", "You're now connected! Catch you later!"]
-    }
+    "RESTART": [">>react>>reset"]
   },
   "reusables": {
     "notImplemented": "Busted! We didn't implement this for this demo! 😅",

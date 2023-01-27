@@ -323,12 +323,10 @@ class mySmooch:
             hitType = "responses"
         else:
             # No direct response - check for keywords
-            for pattern in self.responses["text-matches"].keys():
-                if self.responses["text-matches"][pattern][
-                    "type"
-                ] == "regex" and re.search(pattern, userText, re.IGNORECASE):
+            for pattern in self.responses["regex-matches"].keys():
+                if re.search(pattern, userText, re.IGNORECASE):
                     hit = pattern
-                    hitType = "text-matches"
+                    hitType = "regex-matches"
                     break
 
         if hitType is None:
@@ -339,10 +337,8 @@ class mySmooch:
             hit = "default"
             hitType = "responses"
 
-        if hitType == "responses":
+        if hitType in ["responses", "regex-matches"]:
             resp_list = self.responses[hitType][hit]
-        elif hitType == "text-matches":
-            resp_list = self.responses[hitType][hit]["responses"]
 
         for msg in resp_list:  # Iterate responses
             # Process '>>' commands

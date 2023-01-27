@@ -52,15 +52,18 @@ plugins:
   - serverless-plugin-log-retention
 
 custom:
-  logRetentionIndays: 30
+  logRetentionIndays: 29
   dynamoDbAppIdTableName: "${self:service}-${self:provider.stage}-integratedApps"
   botEndpoint: "pipelineEvent"
   appleEndpoint: "applePassthroughEvent"
-  pythonrequirements:
-    slim: true
-    nodeploy:
-      - boto3
-      - urllib3
+  # pythonrequirements:
+  #   slim: true
+  #   slimPatterns:
+  #     - "**/*.dist-info*" # doesn't seem to work as advertised
+  #     - "**/urllib3*" # doesn't seem to work as advertised
+  #   nodeploy:
+  #     - boto3 # not included to begin with
+  #     - urllib3 # doesn't seem to work as advertised
 
 # you can add packaging information here
 package:
